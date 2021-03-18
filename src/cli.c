@@ -38,9 +38,6 @@ void cli(uint16_t * map){
     printf("Sense Hat Interactive Mode:\n");
     size_t buffSize = 10;
     char *buffer = malloc(10*sizeof(char));
-    //buffSize = parseArgs(buffer,buffSize);
-
-
 
     char * cursor    ;
     char * cursorNext;
@@ -66,7 +63,6 @@ void cli(uint16_t * map){
                 float g = (float)atof(cursor);
                 argGenerator(&cursor,&cursorNext);
                 float b = (float)atof(cursor);
-                argGenerator(&cursor,&cursorNext);
 
                 printf("x: %i y: %i color(rgb): %f %f %f\n",x,y,r,g,b);
                 setVal(map,x,y,rgbFloatToHex(r,g,b));
@@ -81,9 +77,24 @@ void cli(uint16_t * map){
             }
             case 1260:{ // help
                 printf( "commands:\n"
-                        "   set x y colorNum   set x,y coordinate to colorNum (int)\n"
+                        "   set x y r g b   set x,y coordinate to (r,g,b) floats\n"
                         "   clear              clears matrix\n" 
                         "   q                  quits\n");
+                break;
+            }
+            case 1176:{ // fill
+                argGenerator(&cursor,&cursorNext);
+                float r = (float)atof(cursor);
+                argGenerator(&cursor,&cursorNext);
+                printf(cursor);
+                float g = (float)atof(cursor);
+                argGenerator(&cursor,&cursorNext);
+                printf(cursor);
+                float b = (float)atof(cursor);
+
+                printf("%i %i %i\n",r,g,b);
+                uint16_t value = rgbFloatToHex(r,g,b);
+                fill(map,value);
                 break;
             }
         }

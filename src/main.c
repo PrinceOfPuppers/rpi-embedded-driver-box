@@ -4,13 +4,13 @@
 int main(void)
 {
 
-    
+    printf("%i\n",smallHash("fill"));
     uint16_t * ledMatrix = getLedArr();
     
     cli(ledMatrix);
     clear(ledMatrix);
     
-    unmapLedMatrix(ledMatrix);
+    unmapLedArr(ledMatrix);
 
     return 0;
 }

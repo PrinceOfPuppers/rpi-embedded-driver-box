@@ -13,3 +13,5 @@ void unmapLedArr(uint16_t *Arr);
 
 #define clear(Arr) memset(Arr, 0, FILESIZE);
 
+#define fill(Arr,value) for(int i=0; i<LEDS; i+=1){ Arr[i] = value; }
+
