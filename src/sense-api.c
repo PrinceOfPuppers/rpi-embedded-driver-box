@@ -1,3 +1,5 @@
+#include "sense-api.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
@@ -9,8 +11,6 @@
 #include <string.h>
 #include <linux/fb.h>
 #include <sys/ioctl.h>
-
-#include "driver.h"
 
 #define DEV_PATH "/dev/fb1"
 
@@ -38,7 +38,7 @@ uint16_t * getLedArr(){
 
     // check the frame buffers id to ensure it matches the pi sense hat's frame buffer id
     if (strcmp(fix_info.id, "RPi-Sense FB") != 0) {
-	    fprintf(stderr,"Error: Device id %s Found Instead of 'RPi-Sense FB'\n");
+	    fprintf(stderr,"Error: Device id %s Found Instead of 'RPi-Sense FB'\n", fix_info.id);
         fprintf(stderr,"Frame Buffer Length: %i Expected: %i \n",fix_info.smem_len, FILESIZE);
 	    close(fd);
 	    exit(EXIT_FAILURE);

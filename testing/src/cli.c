@@ -1,10 +1,12 @@
+#include "cli.h"
+
 #include <unistd.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "cli.h"
-#include "driver.h"
-#include "helpers.h"
+
+#include "sense-api.h"
+#include "sense-helpers.h"
 
 int argGenerator(char **cursor, char **cursorNext){
     while((**cursorNext)==' '){ // skips past empty spaces
@@ -64,11 +66,12 @@ void cli(uint16_t * map){
                 argGenerator(&cursor,&cursorNext);
                 float b = (float)atof(cursor);
 
-                printf("x: %i y: %i color(rgb): %f %f %f\n",x,y,r,g,b);
+                printf("Setting x: %i y: %i to (r,g,b): (%f, %f, %f)\n",x,y,r,g,b);
                 setVal(map,x,y,rgbFloatToHex(r,g,b));
                 break;
             }
             case 657:{ // clear
+                printf("Clearing\n");
                 clear(map);
                 break;
             }
@@ -86,13 +89,11 @@ void cli(uint16_t * map){
                 argGenerator(&cursor,&cursorNext);
                 float r = (float)atof(cursor);
                 argGenerator(&cursor,&cursorNext);
-                printf(cursor);
                 float g = (float)atof(cursor);
                 argGenerator(&cursor,&cursorNext);
-                printf(cursor);
                 float b = (float)atof(cursor);
 
-                printf("%i %i %i\n",r,g,b);
+                printf("Filling with (r,g,b): (%f, %f, %f)\n",r,g,b);
                 uint16_t value = rgbFloatToHex(r,g,b);
                 fill(map,value);
                 break;

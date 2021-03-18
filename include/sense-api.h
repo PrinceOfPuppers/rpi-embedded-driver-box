@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <string.h>
 
 #define LEDS 64
 #define FILESIZE (LEDS * sizeof(uint16_t))
