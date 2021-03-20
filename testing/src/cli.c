@@ -70,7 +70,7 @@ void cli(uint16_t * map){
                 setVal(map,x,y,rgbFloatToHex(r,g,b));
                 break;
             }
-            case 657:{ // clear
+            case 707:{ // clr
                 printf("Clearing\n");
                 clear(map);
                 break;
@@ -81,8 +81,9 @@ void cli(uint16_t * map){
             case 1260:{ // help
                 printf( "commands:\n"
                         "   set x y r g b   set x,y coordinate to (r,g,b) floats\n"
-                        "   clear              clears matrix\n" 
-                        "   q                  quits\n");
+                        "   fill r g b      fill the matrix with (r,g,b) floats\n"
+                        "   clr             clears the matrix\n" 
+                        "   q               quits\n");
                 break;
             }
             case 1176:{ // fill
