@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdarg.h>
 
 #include "sense-api.h"
 #include "sense-helpers.h"
@@ -34,6 +35,70 @@ int argGenerator(char **cursor, char **cursorNext){
     return 1;
 }
 
+int rasterLineGenerator(int *x, int *y, int endX, int endY){
+    if(*x == endX && *y == endY){ return 0; }
+
+    float diffX = (float)(endX - *x);
+    float diffY = (float)(endY - *y);
+
+    if(endX != *x){
+        float slope = diffY/diffX;
+        if(slope < -0.25 || slope > 0.25){
+            if (diffY > 0){
+                *y+=1;
+            }
+            else{
+                *y-=1;
+            }
+        }
+
+        if(slope > -4 && slope < 4){
+            if (diffX > 0){
+                *x+=1;
+            }
+            else{
+                *x-=1;
+            }
+        }
+        return 1;
+    }
+
+    if (diffY > 0){
+        *y+=1;
+    }
+    else{
+        *y-=1;
+    }
+    return 1;
+}
+
+void colorLine(uint16_t * map, int startX, int startY, int endX, int endY, float r, float g, float b){
+    printf("Setting Pixels on Line from (%i,%i) to (%i, %i) (r,g,b): (%f, %f, %f)\n",startX,startY,endX,endY,r,g,b);
+    setVal(map,startX,startY,rgbFloatToHex(r,g,b));
+    while(rasterLineGenerator(&startX, &startY, endX, endY)){
+        setVal(map,startX,startY,rgbFloatToHex(r,g,b));
+    }
+}
+
+
+int getNARgs(char **cursor, char **cursorNext, int n, ...){
+    
+    va_list v;
+    va_start(v, n);
+
+    char **arg;
+    for (int i = 0; i < n; i++)
+    {
+        arg = va_arg(v, char **);
+        if(!argGenerator(cursor,cursorNext)){
+            return 0;
+        }
+        *arg = *cursor;
+    }
+    return 1;
+}
+
+
 
 
 void cli(uint16_t * map){
@@ -43,7 +108,15 @@ void cli(uint16_t * map){
 
     char * cursor    ;
     char * cursorNext;
-    //int i;
+
+    int fixed = 0;
+
+    float fixr = 0.0;
+    float fixg = 0.0;
+    float fixb = 0.0;
+
+
+    char *arg1, *arg2, *arg3, *arg4;
 
     while(1){
         printf("~ ");
@@ -55,44 +128,123 @@ void cli(uint16_t * map){
         switch(smallHash(cursor)){
 
             case 665:{ // set
-                argGenerator(&cursor,&cursorNext);
-                int x = atoi(cursor);
-                argGenerator(&cursor,&cursorNext);
-                int y = atoi(cursor);
-                argGenerator(&cursor,&cursorNext);
-                float r = (float)atof(cursor);
-                argGenerator(&cursor,&cursorNext);
-                float g = (float)atof(cursor);
-                argGenerator(&cursor,&cursorNext);
-                float b = (float)atof(cursor);
+                if(!getNARgs(&cursor, &cursorNext, 2, &arg1, &arg2)){
+                    if(fixed){
+                        printf("2 Args, x And y, Are Required\n");
+                    }else{
+                        printf("5 Args, x, y, r, g, b, Are Required\n");
+                    }
+                    continue;
+                };
+                int x = atoi(arg1);
+                int y = atoi(arg2);
+
+                if(fixed){
+                    printf("Setting x: %i y: %i to fixed (r,g,b): (%f, %f, %f)\n",x,y,fixr,fixg,fixb);
+                    setVal(map,x,y,rgbFloatToHex(fixr,fixg,fixb));
+                    continue;
+                }
+
+                if(!getNARgs(&cursor, &cursorNext, 3, &arg1, &arg2, &arg3)){
+                    printf("5 Args, x, y, r, g, b, Are Required\n");
+                    continue;
+                };
+                float r = (float)atof(arg1);
+                float g = (float)atof(arg2);
+                float b = (float)atof(arg3);
 
                 printf("Setting x: %i y: %i to (r,g,b): (%f, %f, %f)\n",x,y,r,g,b);
                 setVal(map,x,y,rgbFloatToHex(r,g,b));
                 break;
             }
+
+
+            case 1153:{ //line
+                if(!getNARgs(&cursor, &cursorNext, 4, &arg1, &arg2, &arg3, &arg4)){
+                    if(fixed){
+                        printf("4 Args, startX, startY, endX, endY, Are Required\n");
+                    }
+                    else{
+                        printf("7 Args, startX, startY, endX, endY, r, g, b, Are Required\n");
+                    }
+                    continue;
+                };
+                int x = atoi(arg1);
+                int y = atoi(arg2);
+                int endX = atoi(arg3);
+                int endY = atoi(arg4);
+
+                if(fixed){
+                    colorLine(map, x, y, endX, endY, fixr, fixg, fixb);
+                    continue;
+                }
+                if(!getNARgs(&cursor, &cursorNext, 3, &arg1, &arg2, &arg3)){
+                    printf("7 Args, startX, startY, endX, endY, r, g, b, Are Required\n");
+                    continue;
+                };
+                float r = (float)atof(arg1);
+                float g = (float)atof(arg2);
+                float b = (float)atof(arg3);
+
+                colorLine(map, x, y, endX, endY, r, g, b);
+            }
+
+
+            case 672:{ //fix
+                fixed = 1;
+                if(!getNARgs(&cursor, &cursorNext, 3, &arg1, &arg2, &arg3)){
+                    printf("3 Args, r, g, b, Are Required\n");
+                    continue;
+                };
+                fixr = (float)atof(arg1);
+                fixg = (float)atof(arg2);
+                fixb = (float)atof(arg3);
+                printf("Fixing (r, g, b) to (%f, %f, %f)\n", fixr, fixg, fixb);
+                break;
+
+            }
+
+
+            case 1306:{ //ufix
+                fixed = 0;
+                printf("Un-Fixing (r, g, b)\n");
+                break;
+            }
+
+
             case 707:{ // clr
                 printf("Clearing\n");
                 clear(map);
                 break;
             }
+
+
             case 133:{ //quit
                 return;
             }
+
+
             case 1260:{ // help
                 printf( "commands:\n"
-                        "   set x y r g b   set x,y coordinate to (r,g,b) floats\n"
-                        "   fill r g b      fill the matrix with (r,g,b) floats\n"
-                        "   clr             clears the matrix\n" 
-                        "   q               quits\n");
+                        "   set x y r g b            set x,y coordinate to (r,g,b) floats (color overrided by fix)\n"
+                        "   line x1 y1 x2 y2 r g b   set pixels from x1,y1 to x2,y2 to (r,g,b) floats (color overrided by fix)\n"
+                        "   fix r g b                fix set color to (r,g,b) \n"
+                        "   ufix                     unfix set color\n"
+                        "   fill r g b               fill the matrix with (r,g,b) floats\n"
+                        "   clr                      clears the matrix\n" 
+                        "   q                        quits\n");
                 break;
             }
+
+
             case 1176:{ // fill
-                argGenerator(&cursor,&cursorNext);
-                float r = (float)atof(cursor);
-                argGenerator(&cursor,&cursorNext);
-                float g = (float)atof(cursor);
-                argGenerator(&cursor,&cursorNext);
-                float b = (float)atof(cursor);
+                if(!getNARgs(&cursor, &cursorNext, 3, &arg1, &arg2, &arg3)){
+                    printf("3 Args, r, g, b, Are Required\n");
+                    continue;
+                };
+                float r = (float)atof(arg1);
+                float g = (float)atof(arg2);
+                float b = (float)atof(arg3);
 
                 printf("Filling with (r,g,b): (%f, %f, %f)\n",r,g,b);
                 uint16_t value = rgbFloatToHex(r,g,b);
