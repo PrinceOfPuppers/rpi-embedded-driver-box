@@ -5,6 +5,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include <math.h>
+#include <time.h>
 
 #include "sense-api.h"
 #include "sense-helpers.h"
@@ -72,13 +74,6 @@ int rasterLineGenerator(int *x, int *y, int endX, int endY){
     return 1;
 }
 
-void colorLine(uint16_t * map, int startX, int startY, int endX, int endY, float r, float g, float b){
-    printf("Setting Pixels on Line from (%i,%i) to (%i, %i) (r,g,b): (%f, %f, %f)\n",startX,startY,endX,endY,r,g,b);
-    setVal(map,startX,startY,rgbFloatToHex(r,g,b));
-    while(rasterLineGenerator(&startX, &startY, endX, endY)){
-        setVal(map,startX,startY,rgbFloatToHex(r,g,b));
-    }
-}
 
 
 int getNARgs(char **cursor, char **cursorNext, int n, ...){
@@ -98,10 +93,84 @@ int getNARgs(char **cursor, char **cursorNext, int n, ...){
     return 1;
 }
 
+void colorLine(uint16_t * map, int startX, int startY, int endX, int endY, float r, float g, float b){
+    printf("Setting Pixels on Line from (%i,%i) to (%i, %i) (r,g,b): (%f, %f, %f)\n",startX,startY,endX,endY,r,g,b);
+    setVal(map,startX,startY,rgbFloatToHex(r,g,b));
+    while(rasterLineGenerator(&startX, &startY, endX, endY)){
+        setVal(map,startX,startY,rgbFloatToHex(r,g,b));
+    }
+}
+
+
+void blitpixel(uint16_t *map, float x, float y, float r, float g, float b){
+    float px = trunc(x);
+    float py = trunc(y);
+    int pxi = (int)px;
+    int pyi = (int)py;
+
+
+    float opacity = (1.0 + px - x)*(1.0 + py - y);
+    setVal(map,pxi,pyi,rgbFloatToHex(opacity*r,opacity*g,opacity*b));
+
+    opacity = (x - px)*(py + 1.0 - y);
+    setVal(map, (pxi + 1),pyi,rgbFloatToHex(opacity*r,opacity*g,opacity*b));
+
+    opacity = (px + 1.0 - x)*(y - py);
+    setVal(map,pxi, (pyi + 1),rgbFloatToHex(opacity*r,opacity*g,opacity*b));
+
+    opacity = (x-px)*(y-py);
+    setVal(map,(pxi + 1),(pyi+1),rgbFloatToHex(opacity*r,opacity*g,opacity*b));
+}
+int randInt(int min, int max){
+    return (rand()%(max-min)) + min;
+}
+
+
+void bouncyBall(uint16_t *map){
+    float x = (float)randInt(0, 7);
+    float y = (float)randInt(0, 7);
+
+    float startVelX = (float)randInt(1, 3) / 500.0 + 0.001;
+    float startVelY = (float)randInt(1, 3) / 500.0 + 0.0003;
+
+    int frameTime = 200;
+    while(1){
+        //clear(map);
+        blitpixel(map, x, y, 1.0, 1.0, 1.0);
+
+        x += startVelX;
+        y += startVelY;
+
+        if(x < 0){
+            x = 0;
+            startVelX = - startVelX;
+        }
+        if(x > 7){
+            x = 7;
+            startVelX = - startVelX;
+        }
+
+        if(y < 0){
+            y = 0;
+            startVelY = - startVelY;
+        }
+        if(y > 7){
+            y = 7;
+            startVelY = - startVelY;
+        }
+
+        usleep(frameTime);
+    }
+}
+
 
 
 
 void cli(uint16_t * map){
+
+    time_t t;
+    srand((unsigned) time(&t));
+
     printf("Sense Hat Interactive Mode:\n");
     size_t buffSize = 10;
     char *buffer = malloc(10*sizeof(char));
@@ -189,6 +258,10 @@ void cli(uint16_t * map){
                 colorLine(map, x, y, endX, endY, r, g, b);
                 break;
             }
+            case 1226:{
+                printf("Playing Ball");
+                bouncyBall(map);
+            }
 
 
             case 672:{ //fix
@@ -233,6 +306,7 @@ void cli(uint16_t * map){
                         "   ufix                     unfix set color\n"
                         "   fill r g b               fill the matrix with (r,g,b) floats\n"
                         "   clr                      clears the matrix\n" 
+                        "   ball                     play ball bouncing\n" 
                         "   q                        quits\n");
                 break;
             }
