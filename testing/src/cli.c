@@ -187,6 +187,7 @@ void cli(uint16_t * map){
                 float b = (float)atof(arg3);
 
                 colorLine(map, x, y, endX, endY, r, g, b);
+                break;
             }
 
 
