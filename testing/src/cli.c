@@ -294,7 +294,7 @@ void cli(uint16_t * map){
                         "   fill r g b               fill the matrix with (r,g,b) floats\n"
                         "   clr                      clears the matrix\n" 
                         "   ball r g b               spawn bouncing ball with color (r,g,b)\n" 
-                        "   rmball                    removes the last spawned ball\n" 
+                        "   rmball                   removes the last spawned ball\n" 
                         "   q                        quits\n");
                 break;
             }

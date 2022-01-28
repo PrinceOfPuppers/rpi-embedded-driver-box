@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <unistd.h>
+#include <stdio.h>
 
 #include "ball.h"
 #include "sense-api.h"
@@ -33,13 +34,24 @@ int randInt(int min, int max){
     return (rand()%(max-min)) + min;
 }
 
+float randFloat(float min, float max){
+    float f = ((float)(rand())/RAND_MAX)*(max-min) + min;
+    return f;
+}
+
 
 void bouncyBall(uint16_t *map, int *stopSig, float r, float g, float b){
     float x = (float)randInt(0, 7);
     float y = (float)randInt(0, 7);
 
-    float startVelX = (float)randInt(1, 3) / 500.0 + 0.001;
-    float startVelY = (float)randInt(1, 3) / 500.0 + 0.0003;
+    float startVelX = randFloat(2e-3, 6e-3);
+    float startVelY = randFloat(2e-3, 6e-3);
+    if(randInt(0,1)){
+        startVelX  = -startVelX;
+    }
+    if(randInt(0,1)){
+        startVelY  = -startVelY;
+    }
 
     int frameTime = 200;
     while(!*stopSig){
