@@ -5,18 +5,23 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdarg.h>
-#include <math.h>
 #include <time.h>
 
 #include "sense-api.h"
 #include "sense-helpers.h"
+
+#include "ball.h"
 
 int argGenerator(char **cursor, char **cursorNext){
     while((**cursorNext)==' '){ // skips past empty spaces
         (*cursorNext)++;
     }
 
-    if((**cursorNext)=='\0' || (**cursorNext)=='\n'){ 
+    if ((**cursorNext)=='\n'){
+        **cursorNext = '\0';
+        return 0;
+    }
+    if ( (**cursorNext) == '\0' )  {
         return 0;
     }
 
@@ -24,7 +29,11 @@ int argGenerator(char **cursor, char **cursorNext){
 
     while (**cursorNext != ' ')
     {
-        if ( (**cursorNext) == '\0' || (**cursorNext)=='\n' )  {
+        if ((**cursorNext)=='\n'){
+            **cursorNext = '\0';
+            return 1;
+        }
+        if ( (**cursorNext) == '\0' )  {
             return 1;
         }
 
@@ -102,74 +111,15 @@ void colorLine(uint16_t * map, int startX, int startY, int endX, int endY, float
 }
 
 
-void blitpixel(uint16_t *map, float x, float y, float r, float g, float b){
-    float px = trunc(x);
-    float py = trunc(y);
-    int pxi = (int)px;
-    int pyi = (int)py;
-
-
-    float opacity = (1.0 + px - x)*(1.0 + py - y);
-    setVal(map,pxi,pyi,rgbFloatToHex(opacity*r,opacity*g,opacity*b));
-
-    opacity = (x - px)*(py + 1.0 - y);
-    setVal(map, (pxi + 1),pyi,rgbFloatToHex(opacity*r,opacity*g,opacity*b));
-
-    opacity = (px + 1.0 - x)*(y - py);
-    setVal(map,pxi, (pyi + 1),rgbFloatToHex(opacity*r,opacity*g,opacity*b));
-
-    opacity = (x-px)*(y-py);
-    setVal(map,(pxi + 1),(pyi+1),rgbFloatToHex(opacity*r,opacity*g,opacity*b));
-}
-int randInt(int min, int max){
-    return (rand()%(max-min)) + min;
-}
-
-
-void bouncyBall(uint16_t *map){
-    float x = (float)randInt(0, 7);
-    float y = (float)randInt(0, 7);
-
-    float startVelX = (float)randInt(1, 3) / 500.0 + 0.001;
-    float startVelY = (float)randInt(1, 3) / 500.0 + 0.0003;
-
-    int frameTime = 200;
-    while(1){
-        //clear(map);
-        blitpixel(map, x, y, 1.0, 1.0, 1.0);
-
-        x += startVelX;
-        y += startVelY;
-
-        if(x < 0){
-            x = 0;
-            startVelX = - startVelX;
-        }
-        if(x > 7){
-            x = 7;
-            startVelX = - startVelX;
-        }
-
-        if(y < 0){
-            y = 0;
-            startVelY = - startVelY;
-        }
-        if(y > 7){
-            y = 7;
-            startVelY = - startVelY;
-        }
-
-        usleep(frameTime);
-    }
-}
-
 
 
 
 void cli(uint16_t * map){
-
     time_t t;
     srand((unsigned) time(&t));
+
+    Balls balls;
+    balls._nextBall = 0;
 
     printf("Sense Hat Interactive Mode:\n");
     size_t buffSize = 10;
@@ -194,6 +144,7 @@ void cli(uint16_t * map){
         cursorNext = buffer;
 
         argGenerator(&cursor,&cursorNext);
+        printf("%s: %i\n", cursor, smallHash(cursor));
         switch(smallHash(cursor)){
 
             case 665:{ // set
@@ -258,9 +209,38 @@ void cli(uint16_t * map){
                 colorLine(map, x, y, endX, endY, r, g, b);
                 break;
             }
-            case 1226:{
-                printf("Playing Ball");
-                bouncyBall(map);
+            case 1156:{ // ball
+                if(fixed){
+                    if(!pushBall(&balls, map, fixr, fixg, fixb)){
+                        printf("Unable to Spawn Ball\n");
+                    };
+                    printf("Spawning Ball\n");
+                    break;
+                }
+                if(!getNARgs(&cursor, &cursorNext, 3, &arg1, &arg2, &arg3)){
+                    printf("3 Args, r, g, b, Are Required\n");
+                    continue;
+                };
+
+                float r = (float)atof(arg1);
+                float g = (float)atof(arg2);
+                float b = (float)atof(arg3);
+                if(!pushBall(&balls, map, r, g, b)){
+                    printf("Unable to Spawn Ball\n");
+                    break;
+                };
+                printf("Spawning Ball\n");
+                break;
+            }
+
+            case 1867:{ //rmball
+                if(!popBall(&balls)){
+                    printf("No Ball to Remove\n");
+                    break;
+                };
+                printf("Removing Ball\n");
+                break;
+
             }
 
 
@@ -279,34 +259,42 @@ void cli(uint16_t * map){
             }
 
 
-            case 1306:{ //ufix
+            case 1236:{ //ufix
                 fixed = 0;
                 printf("Un-Fixing (r, g, b)\n");
                 break;
             }
 
 
-            case 707:{ // clr
+            case 657:{ // clr
                 printf("Clearing\n");
                 clear(map);
                 break;
             }
 
 
-            case 133:{ //quit
+            case 113:{ //quit
                 return;
             }
 
 
-            case 1260:{ // help
-                printf( "commands:\n"
-                        "   set x y r g b            set x,y coordinate to (r,g,b) floats (color overrided by fix)\n"
-                        "   line x1 y1 x2 y2 r g b   set pixels from x1,y1 to x2,y2 to (r,g,b) floats (color overrided by fix)\n"
+            case 1190:{ // help
+                printf( "General:\n"
+                        "   Colors:\n" 
+                        "      - are (r,g,b) floats where each value is between 0.0 and 1.0\n"
+                        "      - can be passed to each command, or fixed to a value using fix command\n"
+                        "   Coordinates:\n"
+                        "      - are (x,y) ints where each value is between 0 and 7:\n"
+                        "\n"
+                        "Commands:\n"
+                        "   set x y r g b            set x,y coordinate to (r,g,b) floats\n"
+                        "   line x1 y1 x2 y2 r g b   set pixels from x1,y1 to x2,y2 to (r,g,b) floats\n"
                         "   fix r g b                fix set color to (r,g,b) \n"
                         "   ufix                     unfix set color\n"
                         "   fill r g b               fill the matrix with (r,g,b) floats\n"
                         "   clr                      clears the matrix\n" 
-                        "   ball                     play ball bouncing\n" 
+                        "   ball r g b               spawn bouncing ball with color (r,g,b)\n" 
+                        "   rmball                    removes the last spawned ball\n" 
                         "   q                        quits\n");
                 break;
             }
