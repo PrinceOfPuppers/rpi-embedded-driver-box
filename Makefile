@@ -6,7 +6,7 @@ SRC = src
 LIB = lib
 
 PROGRAM = sense-api
-CFLAGS= -g -O2 -Wall -lm -pthread
+CFLAGS= -g -O2 -Wall -lm -pthread -std=gnu99
 
 INC = -Iinclude
 

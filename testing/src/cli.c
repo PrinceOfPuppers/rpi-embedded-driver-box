@@ -1,5 +1,7 @@
 #include "cli.h"
 
+#define _GNU_SOURCE
+
 #include <unistd.h>
 #include <stdio.h>
 #include <string.h>
@@ -9,8 +11,10 @@
 
 #include "sense-api.h"
 #include "sense-helpers.h"
+#include "demo-helpers.h"
 
 #include "ball.h"
+#include "digital-rain.h"
 
 int argGenerator(char **cursor, char **cursorNext){
     while((**cursorNext)==' '){ // skips past empty spaces
@@ -49,11 +53,11 @@ int argGenerator(char **cursor, char **cursorNext){
 int rasterLineGenerator(int *x, int *y, int endX, int endY){
     if(*x == endX && *y == endY){ return 0; }
 
-    float diffX = (float)(endX - *x);
-    float diffY = (float)(endY - *y);
+    double diffX = (double)(endX - *x);
+    double diffY = (double)(endY - *y);
 
     if(endX != *x){
-        float slope = diffY/diffX;
+        double slope = diffY/diffX;
         if(slope < -0.25 || slope > 0.25){
             if (diffY > 0){
                 *y+=1;
@@ -102,15 +106,13 @@ int getNARgs(char **cursor, char **cursorNext, int n, ...){
     return 1;
 }
 
-void colorLine(uint16_t * map, int startX, int startY, int endX, int endY, float r, float g, float b){
+void colorLine(uint16_t * map, int startX, int startY, int endX, int endY, double r, double g, double b){
     printf("Setting Pixels on Line from (%i,%i) to (%i, %i) (r,g,b): (%f, %f, %f)\n",startX,startY,endX,endY,r,g,b);
-    setVal(map,startX,startY,rgbFloatToHex(r,g,b));
+    setVal(map,startX,startY,rgbDoubleToHex(r,g,b));
     while(rasterLineGenerator(&startX, &startY, endX, endY)){
-        setVal(map,startX,startY,rgbFloatToHex(r,g,b));
+        setVal(map,startX,startY,rgbDoubleToHex(r,g,b));
     }
 }
-
-
 
 
 
@@ -130,9 +132,9 @@ void cli(uint16_t * map){
 
     int fixed = 0;
 
-    float fixr = 0.0;
-    float fixg = 0.0;
-    float fixb = 0.0;
+    double fixr = 0.0;
+    double fixg = 0.0;
+    double fixb = 0.0;
 
 
     char *arg1, *arg2, *arg3, *arg4;
@@ -161,7 +163,7 @@ void cli(uint16_t * map){
 
                 if(fixed){
                     printf("Setting x: %i y: %i to fixed (r,g,b): (%f, %f, %f)\n",x,y,fixr,fixg,fixb);
-                    setVal(map,x,y,rgbFloatToHex(fixr,fixg,fixb));
+                    setVal(map,x,y,rgbDoubleToHex(fixr,fixg,fixb));
                     continue;
                 }
 
@@ -169,12 +171,12 @@ void cli(uint16_t * map){
                     printf("5 Args, x, y, r, g, b, Are Required\n");
                     continue;
                 };
-                float r = (float)atof(arg1);
-                float g = (float)atof(arg2);
-                float b = (float)atof(arg3);
+                double r = (double)atof(arg1);
+                double g = (double)atof(arg2);
+                double b = (double)atof(arg3);
 
                 printf("Setting x: %i y: %i to (r,g,b): (%f, %f, %f)\n",x,y,r,g,b);
-                setVal(map,x,y,rgbFloatToHex(r,g,b));
+                setVal(map,x,y,rgbDoubleToHex(r,g,b));
                 break;
             }
 
@@ -202,13 +204,14 @@ void cli(uint16_t * map){
                     printf("7 Args, startX, startY, endX, endY, r, g, b, Are Required\n");
                     continue;
                 };
-                float r = (float)atof(arg1);
-                float g = (float)atof(arg2);
-                float b = (float)atof(arg3);
+                double r = (double)atof(arg1);
+                double g = (double)atof(arg2);
+                double b = (double)atof(arg3);
 
                 colorLine(map, x, y, endX, endY, r, g, b);
                 break;
             }
+
             case 1156:{ // ball
                 if(fixed){
                     if(!pushBall(&balls, map, fixr, fixg, fixb)){
@@ -222,14 +225,25 @@ void cli(uint16_t * map){
                     continue;
                 };
 
-                float r = (float)atof(arg1);
-                float g = (float)atof(arg2);
-                float b = (float)atof(arg3);
+                double r = (double)atof(arg1);
+                double g = (double)atof(arg2);
+                double b = (double)atof(arg3);
                 if(!pushBall(&balls, map, r, g, b)){
                     printf("Unable to Spawn Ball\n");
                     break;
                 };
                 printf("Spawning Ball\n");
+                break;
+            }
+
+
+            case 1173:{ //drain
+                startDigitalRain(map, 0.0, 1.0, 0.0);
+                break;
+            }
+
+            case 1894:{ //drain
+                stopDigitalRain(map, 0.0, 1.0, 0.0);
                 break;
             }
 
@@ -250,9 +264,9 @@ void cli(uint16_t * map){
                     printf("3 Args, r, g, b, Are Required\n");
                     continue;
                 };
-                fixr = (float)atof(arg1);
-                fixg = (float)atof(arg2);
-                fixb = (float)atof(arg3);
+                fixr = (double)atof(arg1);
+                fixg = (double)atof(arg2);
+                fixb = (double)atof(arg3);
                 printf("Fixing (r, g, b) to (%f, %f, %f)\n", fixr, fixg, fixb);
                 break;
 
@@ -281,17 +295,17 @@ void cli(uint16_t * map){
             case 1190:{ // help
                 printf( "General:\n"
                         "   Colors:\n" 
-                        "      - are (r,g,b) floats where each value is between 0.0 and 1.0\n"
+                        "      - are (r,g,b) doubles where each value is between 0.0 and 1.0\n"
                         "      - can be passed to each command, or fixed to a value using fix command\n"
                         "   Coordinates:\n"
                         "      - are (x,y) ints where each value is between 0 and 7:\n"
                         "\n"
                         "Commands:\n"
-                        "   set x y r g b            set x,y coordinate to (r,g,b) floats\n"
-                        "   line x1 y1 x2 y2 r g b   set pixels from x1,y1 to x2,y2 to (r,g,b) floats\n"
+                        "   set x y r g b            set x,y coordinate to (r,g,b) doubles\n"
+                        "   line x1 y1 x2 y2 r g b   set pixels from x1,y1 to x2,y2 to (r,g,b) doubles\n"
                         "   fix r g b                fix set color to (r,g,b) \n"
                         "   ufix                     unfix set color\n"
-                        "   fill r g b               fill the matrix with (r,g,b) floats\n"
+                        "   fill r g b               fill the matrix with (r,g,b) doubles\n"
                         "   clr                      clears the matrix\n" 
                         "   ball r g b               spawn bouncing ball with color (r,g,b)\n" 
                         "   rmball                   removes the last spawned ball\n" 
@@ -305,12 +319,12 @@ void cli(uint16_t * map){
                     printf("3 Args, r, g, b, Are Required\n");
                     continue;
                 };
-                float r = (float)atof(arg1);
-                float g = (float)atof(arg2);
-                float b = (float)atof(arg3);
+                double r = (double)atof(arg1);
+                double g = (double)atof(arg2);
+                double b = (double)atof(arg3);
 
                 printf("Filling with (r,g,b): (%f, %f, %f)\n",r,g,b);
-                uint16_t value = rgbFloatToHex(r,g,b);
+                uint16_t value = rgbDoubleToHex(r,g,b);
                 fill(map,value);
                 break;
             }

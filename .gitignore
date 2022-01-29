@@ -2,3 +2,4 @@ build
 lib
 .vscode
 .ccls-cache
+compile_commands.json

@@ -20,7 +20,7 @@ void rainbow(uint16_t * ledMatrix){
                 g = 0.5*sin( M_PI*(((double)y+(double)x) /14.0 + t + 2./3.)) + 0.5;
                 b = 0.5*sin( M_PI*( (double)y/14.0 + t + 4./3.)) + 0.5;
 
-                setVal(ledMatrix,x,y,rgbFloatToHex(r,g,b) );
+                setVal(ledMatrix,x,y,rgbDoubleToHex(r,g,b) );
             } 
         }
         t+=0.001;

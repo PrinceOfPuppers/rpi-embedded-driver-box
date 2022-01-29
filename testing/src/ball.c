@@ -2,50 +2,43 @@
 #include <time.h>
 #include <pthread.h>
 #include <stdlib.h>
-#include <pthread.h>
 #include <unistd.h>
 #include <stdio.h>
 
 #include "ball.h"
 #include "sense-api.h"
 #include "sense-helpers.h"
+#include "demo-helpers.h"
 
-void blitpixel(uint16_t *map, float x, float y, float r, float g, float b){
-    float px = trunc(x);
-    float py = trunc(y);
+
+void blitpixel(uint16_t *map, double x, double y, double r, double g, double b){
+    double px = trunc(x);
+    double py = trunc(y);
     int pxi = (int)px;
     int pyi = (int)py;
 
 
-    float opacity = (1.0 + px - x)*(1.0 + py - y);
-    setVal(map,pxi,pyi,rgbFloatToHex(opacity*r,opacity*g,opacity*b));
+    double opacity = (1.0 + px - x)*(1.0 + py - y);
+    setVal(map,pxi,pyi,rgbDoubleToHex(opacity*r,opacity*g,opacity*b));
 
     opacity = (x - px)*(py + 1.0 - y);
-    setVal(map, (pxi + 1),pyi,rgbFloatToHex(opacity*r,opacity*g,opacity*b));
+    setVal(map, (pxi + 1),pyi,rgbDoubleToHex(opacity*r,opacity*g,opacity*b));
 
     opacity = (px + 1.0 - x)*(y - py);
-    setVal(map,pxi, (pyi + 1),rgbFloatToHex(opacity*r,opacity*g,opacity*b));
+    setVal(map,pxi, (pyi + 1),rgbDoubleToHex(opacity*r,opacity*g,opacity*b));
 
     opacity = (x-px)*(y-py);
-    setVal(map,(pxi + 1),(pyi+1),rgbFloatToHex(opacity*r,opacity*g,opacity*b));
-}
-
-int randInt(int min, int max){
-    return (rand()%(max-min)) + min;
-}
-
-float randFloat(float min, float max){
-    float f = ((float)(rand())/RAND_MAX)*(max-min) + min;
-    return f;
+    setVal(map,(pxi + 1),(pyi+1),rgbDoubleToHex(opacity*r,opacity*g,opacity*b));
 }
 
 
-void bouncyBall(uint16_t *map, int *stopSig, float r, float g, float b){
-    float x = (float)randInt(0, 7);
-    float y = (float)randInt(0, 7);
 
-    float startVelX = randFloat(2e-3, 6e-3);
-    float startVelY = randFloat(2e-3, 6e-3);
+void bouncyBall(uint16_t *map, int *stopSig, double r, double g, double b){
+    double x = (double)randInt(0, 7);
+    double y = (double)randInt(0, 7);
+
+    double startVelX = randDouble(2e-3, 6e-3);
+    double startVelY = randDouble(2e-3, 6e-3);
     if(randInt(0,1)){
         startVelX  = -startVelX;
     }
@@ -86,9 +79,9 @@ void bouncyBall(uint16_t *map, int *stopSig, float r, float g, float b){
 typedef struct BallThreadData {
     uint16_t *map;
     int      *stopSig;
-    float r;
-    float g;
-    float b;
+    double r;
+    double g;
+    double b;
 } BallThreadData;
 
 void *ballThread(void *_b){
@@ -96,9 +89,9 @@ void *ballThread(void *_b){
 
     uint16_t *map     = ballData->map;
     int      *stopSig = ballData->stopSig;
-    float     r       = ballData->r;
-    float     g       = ballData->g;
-    float     b       = ballData->b;
+    double     r       = ballData->r;
+    double     g       = ballData->g;
+    double     b       = ballData->b;
 
     free(ballData);
     bouncyBall(map, stopSig, r, g, b);
@@ -106,7 +99,7 @@ void *ballThread(void *_b){
     return NULL;
 }
 
-int spawnBall(uint16_t *map, pthread_t *tId, int *stopSig, float r, float g, float b){
+int spawnBall(uint16_t *map, pthread_t *tId, int *stopSig, double r, double g, double b){
     BallThreadData *ballData = malloc(sizeof(BallThreadData));
     *stopSig = 0;
 
@@ -125,7 +118,7 @@ int spawnBall(uint16_t *map, pthread_t *tId, int *stopSig, float r, float g, flo
     return 1;
 }
 
-int pushBall(Balls *balls, uint16_t *map, float r, float g, float b){
+int pushBall(Balls *balls, uint16_t *map, double r, double g, double b){
     if(balls->_nextBall > MAX_BALLS){
         return 0;
     }
