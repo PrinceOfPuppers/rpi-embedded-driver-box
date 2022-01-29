@@ -237,13 +237,33 @@ void cli(uint16_t * map){
             }
 
 
-            case 1173:{ //drain
-                startDigitalRain(map, 0.0, 1.0, 0.0);
+            case 1173:{ //rain
+                if(fixed){
+                    
+                    if(!startDigitalRain(map, fixr, fixg, fixb)){
+                        printf("Unable to Start Digital Rain\n");
+                    };
+                    printf("Starting Digital Rain\n");
+                    break;
+                }
+                if(!getNARgs(&cursor, &cursorNext, 3, &arg1, &arg2, &arg3)){
+                    printf("3 Args, r, g, b, Are Required\n");
+                    continue;
+                };
+
+                double r = (double)atof(arg1);
+                double g = (double)atof(arg2);
+                double b = (double)atof(arg3);
+
+                if(!startDigitalRain(map, r, g, b)){
+                    printf("Unable to Start Digital Rain\n");
+                };
+                printf("Starting Digital Rain\n");
                 break;
             }
 
-            case 1894:{ //drain
-                stopDigitalRain(map, 0.0, 1.0, 0.0);
+            case 1894:{ //rmrain
+                stopDigitalRain();
                 break;
             }
 
@@ -301,16 +321,51 @@ void cli(uint16_t * map){
                         "      - are (x,y) ints where each value is between 0 and 7:\n"
                         "\n"
                         "Commands:\n"
-                        "   set x y r g b            set x,y coordinate to (r,g,b) doubles\n"
-                        "   line x1 y1 x2 y2 r g b   set pixels from x1,y1 to x2,y2 to (r,g,b) doubles\n"
-                        "   fix r g b                fix set color to (r,g,b) \n"
-                        "   ufix                     unfix set color\n"
-                        "   fill r g b               fill the matrix with (r,g,b) doubles\n"
-                        "   clr                      clears the matrix\n" 
-                        "   ball r g b               spawn bouncing ball with color (r,g,b)\n" 
-                        "   rmball                   removes the last spawned ball\n" 
-                        "   q                        quits\n");
+                        "   grid dir                prints a grid of leds, dir is which side the pi's ports are facing (u, d, l r)\n"
+                        "   set x y r g b           set x,y coordinate to (r,g,b) doubles\n"
+                        "   line x1 y1 x2 y2 r g b  set pixels from x1,y1 to x2,y2 to (r,g,b) doubles\n"
+                        "   fix r g b               fix set color to (r,g,b) \n"
+                        "   ufix                    unfix set color\n"
+                        "   fill r g b              fill the matrix with (r,g,b) doubles\n"
+                        "   clr                     clears the matrix\n" 
+                        "   ball r g b              spawn bouncing ball with color (r,g,b)\n" 
+                        "   rmball                  removes the last spawned ball\n" 
+                        "   rain r g b              start digital rain with color (r,g,b)\n" 
+                        "   rmrain                  stop digital rain\n" 
+                        "   q                       quits\n");
                 break;
+            }
+            case 1146:{ // grid
+
+                if(!getNARgs(&cursor, &cursorNext, 1, &arg1)){
+                    printf("1 Arg is required for which direction the ports of the pi are facing, one of (u, d, l, r)\n");
+                    continue;
+                };
+                char direction = arg1[0];
+
+                if(direction == 'r'){     printf("Ports Right ->\n");}
+                else if(direction == 'l'){printf("<- Ports Left\n");}
+                else if(direction == 'u'){printf("Ports Up ^\n");}
+                else if(direction == 'd'){printf("Ports Down v\n");}
+
+                for(int x = 0; x < 8; x++){
+                    for(int y = 0; y < 8; y++){
+                        if(direction == 'r'){
+                            printf("(%i,%i) ", y, x);
+                        }
+                        if(direction == 'l'){
+                            printf("(%i,%i) ", mathMod(7-y,8), mathMod(7-x,8));
+                        }
+
+                        if(direction == 'u'){
+                            printf("(%i,%i) ", mathMod(7-x,8), y);
+                        }
+                        if(direction == 'd'){
+                            printf("(%i,%i) ", x, mathMod(7-y,8));
+                        }
+                    }
+                    printf("\n\n");
+                }
             }
 
 
