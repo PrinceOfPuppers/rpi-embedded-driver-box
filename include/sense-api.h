@@ -6,7 +6,7 @@
 #define LEDS 64
 #define FILESIZE (LEDS * sizeof(uint16_t))
 
-uint16_t * getLedArr();
+uint16_t *getLedArr();
 
 void unmapLedArr(uint16_t *Arr);
 

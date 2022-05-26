@@ -16,7 +16,6 @@
 
 int fd;
 
-
 uint16_t * getLedArr(){
     uint16_t *ledArr;
     struct fb_fix_screeninfo fix_info;

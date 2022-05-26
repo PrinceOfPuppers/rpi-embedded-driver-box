@@ -5,7 +5,7 @@ SRC = src
 # Where the .a and .o files are compiled to
 LIB = lib
 
-PROGRAM = sense-api
+PROGRAM = rpi-embedded-driver-box
 CFLAGS= -g -O2 -Wall -lm -pthread -std=gnu99
 
 INC = -Iinclude
