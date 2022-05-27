@@ -4,8 +4,6 @@ int randInt(int min, int max);
 
 double randDouble(double min, double max);
 
-void blitpixel(uint16_t *map, double x, double y, double r, double g, double b);
-
 #define mathMod(a, b)        \
 ({                           \
     __typeof__ (a) _a = (a); \

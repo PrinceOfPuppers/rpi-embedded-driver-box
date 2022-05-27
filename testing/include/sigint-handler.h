@@ -2,5 +2,5 @@
 
 int sigint_triggered;
 
-void init_handler();
-void destroy_handler();
+void init_sigint_handler();
+void destroy_sigint_handler();

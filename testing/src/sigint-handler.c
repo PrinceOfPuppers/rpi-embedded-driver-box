@@ -1,5 +1,7 @@
 #include "sigint-handler.h"
 
+#include <signal.h>
+
 void sigint_handler(){
     sigint_triggered = 1;
 }

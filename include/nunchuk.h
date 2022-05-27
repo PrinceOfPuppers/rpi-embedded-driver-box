@@ -1,4 +1,5 @@
-#pragma once
+#ifndef NUNCHUK_H_
+#define NUNCHUK_H_
 
 #define NUNCHUK_DEBUG 0
 
@@ -20,3 +21,5 @@ struct Nunchuk{
 typedef struct Nunchuk Nunchuk;
 
 int get_nunchuk(Nunchuk* n);
+
+#endif

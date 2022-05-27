@@ -1,5 +1,9 @@
 #include "demo-helpers.h"
+
 #include <stdlib.h>
+#include <stdarg.h>
+#include <stdint.h>
+#include <math.h>
 
 int randInt(int min, int max){
     return (rand()%(max-min)) + min;
@@ -10,25 +14,6 @@ double randDouble(double min, double max){
     return f;
 }
 
-void blitpixel(uint16_t *map, double x, double y, double r, double g, double b){
-    double px = trunc(x);
-    double py = trunc(y);
-    int pxi = (int)px;
-    int pyi = (int)py;
-
-
-    double opacity = (1.0 + px - x)*(1.0 + py - y);
-    setVal(map,pxi,pyi,rgbDoubleToHex(opacity*r,opacity*g,opacity*b));
-
-    opacity = (x - px)*(py + 1.0 - y);
-    setVal(map, (pxi + 1),pyi,rgbDoubleToHex(opacity*r,opacity*g,opacity*b));
-
-    opacity = (px + 1.0 - x)*(y - py);
-    setVal(map,pxi, (pyi + 1),rgbDoubleToHex(opacity*r,opacity*g,opacity*b));
-
-    opacity = (x-px)*(y-py);
-    setVal(map,(pxi + 1),(pyi+1),rgbDoubleToHex(opacity*r,opacity*g,opacity*b));
-}
 
 
 int getNARgs(char **cursor, char **cursorNext, int n, ...){

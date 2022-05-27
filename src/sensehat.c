@@ -11,6 +11,7 @@
 #include <string.h>
 #include <linux/fb.h>
 #include <sys/ioctl.h>
+#include <math.h>
 
 #define DEV_PATH_FMT "/dev/fb%c"
 
@@ -66,3 +67,37 @@ void unmapLedArr(uint16_t * ledArr){
     }
     close(fd);
 }
+
+uint16_t rgbIntToHex(uint16_t r, uint16_t g, uint16_t b){
+
+    r = r << 11;
+
+    g = g << 5;
+
+    return r|g|b;
+}
+
+uint16_t rgbDoubleToHex(double r, double g, double b){
+    return rgbIntToHex((uint16_t)(r*31),(uint16_t)(g*63),(uint16_t)(b*31));
+}
+
+void blitpixel(uint16_t *map, double x, double y, double r, double g, double b){
+    double px = trunc(x);
+    double py = trunc(y);
+    int pxi = (int)px;
+    int pyi = (int)py;
+
+
+    double opacity = (1.0 + px - x)*(1.0 + py - y);
+    setVal(map,pxi,pyi,rgbDoubleToHex(opacity*r,opacity*g,opacity*b));
+
+    opacity = (x - px)*(py + 1.0 - y);
+    setVal(map, (pxi + 1),pyi,rgbDoubleToHex(opacity*r,opacity*g,opacity*b));
+
+    opacity = (px + 1.0 - x)*(y - py);
+    setVal(map,pxi, (pyi + 1),rgbDoubleToHex(opacity*r,opacity*g,opacity*b));
+
+    opacity = (x-px)*(y-py);
+    setVal(map,(pxi + 1),(pyi+1),rgbDoubleToHex(opacity*r,opacity*g,opacity*b));
+}
+

@@ -1,5 +1,4 @@
 #include "nunchuk.h"
-#include "helpers.h"
 
 #include <stdint.h>
 #include <stdio.h>
@@ -8,6 +7,7 @@
 #include <sys/ioctl.h>			//Needed for I2C port
 #include <linux/i2c-dev.h>		//Needed for I2C port
 
+#include "driver-box-helpers.h"
 
 
 int inited = 0;
@@ -86,9 +86,9 @@ int write_i2c(int file_i2c, int len){
 
 
 int _get_raw(){
-    buff[0] = 0x00;
-    if(!write_i2c(nunchuk_file_i2c, 1)){return 0;}
-    usleep(10);
+    //buff[0] = 0x00;
+    //if(!write_i2c(nunchuk_file_i2c, 1)){return 0;}
+    //usleep(10);
     if(!read_i2c(nunchuk_file_i2c, 6)){return 0;}
     return 1;
 }

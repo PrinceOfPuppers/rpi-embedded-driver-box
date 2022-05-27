@@ -1,6 +1,5 @@
 #include <stdio.h>
-#include "sense-api.h"
-#include "sense-helpers.h"
+
 #include "sigint-handler.h"
 #include "cli.h"
 

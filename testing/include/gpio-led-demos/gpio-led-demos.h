@@ -1,5 +1,6 @@
-#ifndef "gpio-led-demos/led_bar_graph.h"
-#define "gpio-led-demos/led_bar_graph.h"
+#ifndef GPIO_LED_DEMOS_GPIO_LED_DEMOS_H_
+#define GPIO_LED_DEMOS_GPIO_LED_DEMOS_H_
 
+void gpio_led_cli(char *buff);
 
 #endif

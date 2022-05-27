@@ -1,4 +1,7 @@
-#pragma once
+#ifndef GPIO_H_
+#define GPIO_H_
 
 int export_pin(char *pin_num, char *direction);
 int unexport_pin(char *pin_num, int pin_fd);
+
+#endif

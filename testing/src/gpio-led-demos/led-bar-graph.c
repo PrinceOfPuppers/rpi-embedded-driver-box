@@ -1,4 +1,4 @@
-#include "gpio-led-demos/led_bar_graph.h"
+#include "gpio-led-demos/led-bar-graph.h"
 
 #include <pthread.h>
 

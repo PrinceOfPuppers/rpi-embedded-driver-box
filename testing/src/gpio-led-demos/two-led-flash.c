@@ -1,4 +1,4 @@
-#include "gpio-led-demos/two_led_flash.h"
+#include "gpio-led-demos/two-led-flash.h"
 
 #include <pthread.h>
 
@@ -49,23 +49,23 @@ pthread_t tId;
 int _stop_sig;
 int inited;
 
-void *twoLedFlashThread(void *){
+void *two_led_flash_thread(void *){
     two_led_flash(&_stop_sig);
 
     return NULL;
 }
 
-void stopTwoLedFlash(){
+void stop_two_led_flash(){
     if(inited && !_stopSig){
         _stopSig = 1;
         pthread_join(tId, NULL);
     }
 }
 
-int startTwoLedFlash(){
-    stopTwoLedFlash();
+int start_two_led_flash(){
+    stop_two_led_flash();
     _stopSig = 0;
-    int error = pthread_create(&tId, NULL, twoLedFlashThread);
+    int error = pthread_create(&tId, NULL, two_led_flash_thread);
     if (error) {
         return 0;
     }

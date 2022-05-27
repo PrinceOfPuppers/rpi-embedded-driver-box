@@ -1,5 +1,5 @@
-#ifndef "sensehat-demos/digital-rain.h"
-#define "sensehat-demos/digital-rain.h"
+#ifndef SENSEHAT_DEMOS_DIGITAL_RAIN_H_
+#define SENSEHAT_DEMOS_DIGITAL_RAIN_H_
 
 #include <stdint.h>
 

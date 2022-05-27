@@ -1,5 +1,5 @@
-#ifndef "sensehat-demos/ball.h"
-#define "sensehat-demos/ball.h"
+#ifndef SENSEHAT_DEMOS_BALL_H_
+#define SENSEHAT_DEMOS_BALL_H_
 
 #include <stdint.h>
 #include <pthread.h>
