@@ -1,4 +1,6 @@
-#pragma once
+#ifndef "sensehat-demos/ball.h"
+#define "sensehat-demos/ball.h"
+
 #include <stdint.h>
 #include <pthread.h>
 
@@ -13,3 +15,5 @@ typedef struct Balls {
 int pushBall(Balls *balls, uint16_t *map, double r, double g, double b);
 
 int popBall(Balls *balls);
+
+#endif

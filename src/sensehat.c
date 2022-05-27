@@ -1,4 +1,4 @@
-#include "sense-api.h"
+#include "sensehat.h"
 
 #include <stdio.h>
 #include <stdlib.h>

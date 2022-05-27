@@ -1,4 +1,4 @@
-#include "cli.h"
+#include "sensehat-demos/sensehat-demos.h"
 
 #define _GNU_SOURCE
 
@@ -9,12 +9,11 @@
 #include <stdarg.h>
 #include <time.h>
 
-#include "sense-api.h"
-#include "sense-helpers.h"
+#include "sensehat.h"
 #include "demo-helpers.h"
 
-#include "sensehat/ball.h"
-#include "sensehat/digital-rain.h"
+#include "sensehat-demos/ball.h"
+#include "sensehat-demos/digital-rain.h"
 #include "sigint-handler.h"
 
 
@@ -335,16 +334,11 @@ void sensehat_cli(char *buff){
 
     }
 
+    stopDigitalRain();
+    stopBalls(&balls);
+
     clear(ledMatrix);
     unmapLedArr(ledMatrix);
     return;
 }
 
-void cli(){
-    size_t buffSize = 10;
-    char *buffer = malloc(10*sizeof(char));
-
-    sensehat_cli(buff);
-
-    free(buffer); 
-}

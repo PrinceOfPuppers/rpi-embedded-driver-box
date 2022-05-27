@@ -5,8 +5,8 @@
 #include <stdio.h>
 
 
-#include "sensehat/digital-rain.h"
-#include "sensehat-driver.h"
+#include "sensehat-demos/digital-rain.h"
+#include "sensehat.h"
 #include "driver-box-helpers.h"
 #include "demo-helpers.h"
 

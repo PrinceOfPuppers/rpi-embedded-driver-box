@@ -5,8 +5,8 @@
 #include <unistd.h>
 #include <stdio.h>
 
-#include "sensehat/ball.h"
-#include "sensehat-driver.h"
+#include "sensehat-demos/ball.h"
+#include "sensehat.h"
 #include "driver-box-helpers.h"
 #include "demo-helpers.h"
 #incldue "sigint-handler.h"
@@ -115,4 +115,8 @@ int popBall(Balls *balls){
     (balls->_stopSigs[balls->_nextBall - 1]) = 1;
     balls->_nextBall -= 1;
     return 1;
+}
+
+int stopBalls(Balls *balls){
+    while(popBall()){}
 }
