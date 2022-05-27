@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "sense-api.h"
 #include "sense-helpers.h"
-
+#include "sigint-handler.h"
 #include "cli.h"
 
 /* ---Rainbow Effect--- (requires math library to be linked with -lm)
@@ -33,13 +33,9 @@ void rainbow(uint16_t * ledMatrix){
 
 int main(void)
 {
+    init_sigint_handler();
 
-    uint16_t * ledMatrix = getLedArr();
-
-    cli(ledMatrix);
-    clear(ledMatrix);
+    cli();
     
-    unmapLedArr(ledMatrix);
-
     return 0;
 }

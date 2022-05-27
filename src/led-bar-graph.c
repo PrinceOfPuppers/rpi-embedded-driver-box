@@ -40,6 +40,7 @@ void led_bar_graph_destroy(){
             continue;
         }
         pin_num = i + LED_BAR_GRAPH_GPIO_START;
+        write(fds[i], "0", 1);
         unexport_pin(pin_num_buff, fds[i]);
     }
 

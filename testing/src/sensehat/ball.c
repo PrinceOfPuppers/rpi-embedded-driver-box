@@ -5,32 +5,11 @@
 #include <unistd.h>
 #include <stdio.h>
 
-#include "ball.h"
-#include "sense-api.h"
-#include "sense-helpers.h"
+#include "sensehat/ball.h"
+#include "sensehat-driver.h"
+#include "driver-box-helpers.h"
 #include "demo-helpers.h"
-
-
-void blitpixel(uint16_t *map, double x, double y, double r, double g, double b){
-    double px = trunc(x);
-    double py = trunc(y);
-    int pxi = (int)px;
-    int pyi = (int)py;
-
-
-    double opacity = (1.0 + px - x)*(1.0 + py - y);
-    setVal(map,pxi,pyi,rgbDoubleToHex(opacity*r,opacity*g,opacity*b));
-
-    opacity = (x - px)*(py + 1.0 - y);
-    setVal(map, (pxi + 1),pyi,rgbDoubleToHex(opacity*r,opacity*g,opacity*b));
-
-    opacity = (px + 1.0 - x)*(y - py);
-    setVal(map,pxi, (pyi + 1),rgbDoubleToHex(opacity*r,opacity*g,opacity*b));
-
-    opacity = (x-px)*(y-py);
-    setVal(map,(pxi + 1),(pyi+1),rgbDoubleToHex(opacity*r,opacity*g,opacity*b));
-}
-
+#incldue "sigint-handler.h"
 
 
 void bouncyBall(uint16_t *map, int *stopSig, double r, double g, double b){
@@ -47,7 +26,7 @@ void bouncyBall(uint16_t *map, int *stopSig, double r, double g, double b){
     }
 
     int frameTime = 200;
-    while(!*stopSig){
+    while(!*stopSig && !sigint_triggered){
         blitpixel(map, x, y, r, g, b);
 
         x += startVelX;

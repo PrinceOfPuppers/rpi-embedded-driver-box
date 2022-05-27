@@ -5,10 +5,12 @@
 #include <stdio.h>
 
 
-#include "digital-rain.h"
-#include "sense-api.h"
-#include "sense-helpers.h"
+#include "sensehat/digital-rain.h"
+#include "sensehat-driver.h"
+#include "driver-box-helpers.h"
 #include "demo-helpers.h"
+
+#include "sigint-handler.h"
 
 
 double tailOpacityCurve(double y, int ledY, double tailLen){
@@ -40,7 +42,7 @@ void digitalRain(uint16_t *map, int *stopSig, double r, double g, double b){
         dropVels[i] = randDouble(8e-3, 3e-2);
     }
 
-    while(!*stopSig){
+    while(!*stopSig &&!sigint_triggered){
         for(int i = 0; i < 8; i++){
             dropYs[i] += dropVels[i];
             dropYs[i] = fmod(dropYs[i], 7.99999999);
@@ -80,7 +82,6 @@ void *digitalRainThread(void *_b){
 
 pthread_t tId;
 int _stopSig;
-
 
 int inited;
 
