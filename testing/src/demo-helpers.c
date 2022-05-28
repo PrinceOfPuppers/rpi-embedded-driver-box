@@ -16,7 +16,7 @@ double randDouble(double min, double max){
 
 
 
-int primes[5] = {1,2,3,5,7};
+int primes[11] = {1,2,3,5,7,11,13,17,19,23,29};
 
 int smallHash(char * str){
     int sum = 0;

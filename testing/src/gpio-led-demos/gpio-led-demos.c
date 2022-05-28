@@ -9,14 +9,11 @@
 #include "demo-helpers.h"
 
 void gpio_led_cli(char *buffer, size_t *buffSize){
-    printf("GPIO LED Interactive Mode:\n");
-
     char *cursor    ;
     char *cursorNext;
 
-    char *arg1, *arg2, *arg3, *arg4;
-
     while(!sigint_triggered){
+        printf("\nGPIO LED Demos (type help for options):\n");
         printf("~ ");
         *buffSize = getline(&buffer, buffSize, stdin);
         cursor     = buffer;
@@ -25,45 +22,53 @@ void gpio_led_cli(char *buffer, size_t *buffSize){
         argGenerator(&cursor,&cursorNext);
         printf("%s: %i\n", cursor, smallHash(cursor));
         switch(smallHash(cursor)){
-            case 1901:{ // graph
-                if(!getNARgs(&cursor, &cursorNext, 2, &arg1, &arg2)){
-                    //printf("2 Args, x And y, Are Required\n");
-                    continue;
+
+            case 634:{ // bar
+                start_led_bar_graph();
                 break;
-                };
             }
 
-            case 1350224098:{ // rmgraph
+            case 1909:{ // rmbar
+                stop_led_bar_graph();
                 break;
             }
 
 
             case 1912:{ // flash
+                start_two_led_flash();
                 break;
             }
 
 
-            case 1350224065:{ // rmflash
+            case 4474:{ // rmflash
+                stop_two_led_flash();
                 break;
             }
 
 
-            case 113:{ //quit
+            case 113:{ // q
                 goto gpio_cli_clean_up;
             }
 
 
             case 1190:{ // help
                 printf( "Commands:\n"
-                        "   graph     cycles through led bar graph on gpio pins specified in led-bar-graph.h\n"
-                        "   rmgraph   stops graph\n"
+                        "   bar       cycles through led bar graph on gpio pins specified in led-bar-graph.h\n"
+                        "   rmbar     stops bar\n"
                         "   flash     flashes 2 leds on gpio pins specified in two-led-flash.h\n" 
                         "   rmflash   stops flash\n" 
-                        "   q         quits\n");
+                        "   q         quits to previous menu\n");
                 break;
             }
-        }
 
+            case 0:{
+                break;
+            }
+
+            default:{
+                printf("%s is not an option\n", cursor);
+            }
+        }
     }
     
     gpio_cli_clean_up:

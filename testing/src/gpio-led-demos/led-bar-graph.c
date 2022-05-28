@@ -16,11 +16,11 @@ int led_bar_graph(int *stop_sig){
     int i = 0;
     while(!sigint_triggered && !*stop_sig){
         num = i % LED_BAR_GRAPH_GPIO_NUM;
-        if (led_bar_graph_set(prev_num, 0)) {
+        if (!led_bar_graph_set(prev_num, 0)) {
             err = 1; 
             goto led_bar_graph_test_end;
         }
-        if (led_bar_graph_set(num, 1)) {
+        if (!led_bar_graph_set(num, 1)) {
             err = 1; 
             goto led_bar_graph_test_end;
         }
@@ -44,7 +44,6 @@ int inited;
 
 void *led_bar_graph_thread(void *_){
     led_bar_graph(&_stop_sig);
-
     return NULL;
 }
 

@@ -72,7 +72,6 @@ void sensehat_cli(char *buffer, size_t *buffSize){
     Balls balls;
     balls._nextBall = 0;
 
-    printf("Sense Hat Interactive Mode:\n");
 
     char * cursor    ;
     char * cursorNext;
@@ -87,13 +86,13 @@ void sensehat_cli(char *buffer, size_t *buffSize){
     char *arg1, *arg2, *arg3, *arg4;
 
     while(!sigint_triggered){
+        printf("\nSenseHat Demos (type help for options):\n");
         printf("~ ");
         *buffSize = getline(&buffer, buffSize, stdin);
         cursor     = buffer;
         cursorNext = buffer;
 
         argGenerator(&cursor,&cursorNext);
-        printf("%s: %i\n", cursor, smallHash(cursor));
         switch(smallHash(cursor)){
 
             case 665:{ // set
@@ -254,7 +253,7 @@ void sensehat_cli(char *buffer, size_t *buffSize){
             }
 
 
-            case 113:{ //quit
+            case 113:{ // q
                 goto sensehat_cli_cleanup;
             }
 
@@ -330,6 +329,16 @@ void sensehat_cli(char *buffer, size_t *buffSize){
                 fill(map,value);
                 break;
             }
+
+
+            case 0:{
+                break;
+            }
+
+            default:{
+                printf("%s is not an option\n", cursor);
+            }
+
         }
 
     }
