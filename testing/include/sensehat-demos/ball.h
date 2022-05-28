@@ -16,4 +16,6 @@ int pushBall(Balls *balls, uint16_t *map, double r, double g, double b);
 
 int popBall(Balls *balls);
 
+void stopBalls(Balls *balls);
+
 #endif

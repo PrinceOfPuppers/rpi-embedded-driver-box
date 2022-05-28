@@ -3,8 +3,6 @@
 
 #include <stdint.h>
 
-int smallHash(char * str);
-
 #define max(a,b)             \
 ({                           \
     __typeof__ (a) _a = (a); \

@@ -8,6 +8,7 @@
 #include "sigint-handler.h"
 #include "gpio.h"
 #include "nunchuk.h"
+#include "led-bar-graph.h"
 
 
 int nunchuk_led_bar_graph(){
@@ -19,8 +20,8 @@ int nunchuk_led_bar_graph(){
 
     while(!sigint_triggered){
         if(!get_nunchuk(&n)){continue;};
-        num = (int)((( (float)(n.joystick_y + 1) ) / 2.0) * (float)GPIO_NUM + 0.2);
-        num = max(min(num, GPIO_NUM-1), 0);
+        num = (int)((( (float)(n.joystick_y + 1) ) / 2.0) * (float)LED_BAR_GRAPH_GPIO_NUM  + 0.2);
+        num = max(min(num, LED_BAR_GRAPH_GPIO_NUM -1), 0);
 
         if (led_bar_graph_set(prev_num, 0)) {
             err = 1; 
@@ -36,7 +37,7 @@ int nunchuk_led_bar_graph(){
     }
 
     nunchuk_led_bar_graph_test_end:
-    led_gar_graph_destroy(fds, pin_num_buff);
+    led_bar_graph_destroy();
     if(err){
         perror("");
         return 1;
@@ -48,7 +49,7 @@ int nunchuk_test()
 {
     Nunchuk n;
 
-    i=0;
+    int i=0;
     while(!sigint_triggered){
         printf("loop: %i\n", i);
         if(!get_nunchuk(&n)){continue;};

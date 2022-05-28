@@ -1,8 +1,11 @@
 #include "gpio-led-demos/led-bar-graph.h"
 
 #include <pthread.h>
+#include <errno.h>
+#include <stdio.h>
+#include <unistd.h>
 
-#include "led_bar_graph.h"
+#include "led-bar-graph.h"
 #include "sigint-handler.h"
 
 int led_bar_graph(int *stop_sig){
@@ -12,7 +15,7 @@ int led_bar_graph(int *stop_sig){
     int prev_num = 0;
     int i = 0;
     while(!sigint_triggered && !*stop_sig){
-        num = i % GPIO_NUM;
+        num = i % LED_BAR_GRAPH_GPIO_NUM;
         if (led_bar_graph_set(prev_num, 0)) {
             err = 1; 
             goto led_bar_graph_test_end;
@@ -27,7 +30,7 @@ int led_bar_graph(int *stop_sig){
     }
 
     led_bar_graph_test_end:
-    led_gar_graph_destroy();
+    led_bar_graph_destroy();
     if(err){
         perror("");
         return 1;
@@ -39,23 +42,23 @@ pthread_t tId;
 int _stop_sig;
 int inited;
 
-void *led_bar_graph_thread(void *){
+void *led_bar_graph_thread(void *_){
     led_bar_graph(&_stop_sig);
 
     return NULL;
 }
 
 void stop_led_bar_graph(){
-    if(inited && !_stopSig){
-        _stopSig = 1;
+    if(inited && !_stop_sig){
+        _stop_sig = 1;
         pthread_join(tId, NULL);
     }
 }
 
 int start_led_bar_graph(){
     stop_led_bar_graph();
-    _stopSig = 0;
-    int error = pthread_create(&tId, NULL, led_bar_graph_thread);
+    _stop_sig = 0;
+    int error = pthread_create(&tId, NULL, led_bar_graph_thread, NULL);
     if (error) {
         return 0;
     }

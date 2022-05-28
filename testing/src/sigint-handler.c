@@ -8,7 +8,8 @@ void sigint_handler(){
 
 void init_sigint_handler(){
     sigint_triggered = 0;
-    signal(SIGINT, sigint_handler);
+    struct sigaction int_handler = {.sa_handler=sigint_handler};
+    sigaction(SIGINT,&int_handler,0);
 }
 
 void destroy_sigint_handler(){

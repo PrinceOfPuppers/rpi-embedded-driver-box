@@ -1,59 +1,55 @@
 #include "gpio-led-demos/gpio-led-demos.h"
 
+#include <stdio.h>
+
 #include "gpio-led-demos/led-bar-graph.h"
 #include "gpio-led-demos/two-led-flash.h"
 
-void gpio_led_cli(char *buff){
+#include "sigint-handler.h"
+#include "demo-helpers.h"
+
+void gpio_led_cli(char *buffer, size_t *buffSize){
     printf("GPIO LED Interactive Mode:\n");
 
-    char * cursor    ;
-    char * cursorNext;
+    char *cursor    ;
+    char *cursorNext;
 
     char *arg1, *arg2, *arg3, *arg4;
 
     while(!sigint_triggered){
         printf("~ ");
-        buffSize = getline(&buffer,&buffSize,stdin);
+        *buffSize = getline(&buffer, buffSize, stdin);
         cursor     = buffer;
         cursorNext = buffer;
 
         argGenerator(&cursor,&cursorNext);
         printf("%s: %i\n", cursor, smallHash(cursor));
         switch(smallHash(cursor)){
-
-            case 665:{ // set
+            case 1901:{ // graph
                 if(!getNARgs(&cursor, &cursorNext, 2, &arg1, &arg2)){
-                    if(fixed){
-                        printf("2 Args, x And y, Are Required\n");
-                    }else{
-                        printf("5 Args, x, y, r, g, b, Are Required\n");
-                    }
+                    //printf("2 Args, x And y, Are Required\n");
                     continue;
+                break;
                 };
-                int x = atoi(arg1);
-                int y = atoi(arg2);
+            }
 
-                if(fixed){
-                    printf("Setting x: %i y: %i to fixed (r,g,b): (%f, %f, %f)\n",x,y,fixr,fixg,fixb);
-                    setVal(map,x,y,rgbDoubleToHex(fixr,fixg,fixb));
-                    continue;
-                }
-
-                if(!getNARgs(&cursor, &cursorNext, 3, &arg1, &arg2, &arg3)){
-                    printf("5 Args, x, y, r, g, b, Are Required\n");
-                    continue;
-                };
-                double r = (double)atof(arg1);
-                double g = (double)atof(arg2);
-                double b = (double)atof(arg3);
-
-                printf("Setting x: %i y: %i to (r,g,b): (%f, %f, %f)\n",x,y,r,g,b);
-                setVal(map,x,y,rgbDoubleToHex(r,g,b));
+            case 1350224098:{ // rmgraph
                 break;
             }
 
-            case 113:{ //quit
+
+            case 1912:{ // flash
                 break;
+            }
+
+
+            case 1350224065:{ // rmflash
+                break;
+            }
+
+
+            case 113:{ //quit
+                goto gpio_cli_clean_up;
             }
 
 
@@ -69,8 +65,9 @@ void gpio_led_cli(char *buff){
         }
 
     }
-
-    stop_led_bar_graph():
-    stop_two_led_flash():
+    
+    gpio_cli_clean_up:
+    stop_led_bar_graph();
+    stop_two_led_flash();
     return;
 }

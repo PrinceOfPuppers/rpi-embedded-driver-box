@@ -6,6 +6,6 @@
 
 int led_bar_graph_init();
 void led_bar_graph_destroy();
-int led_gar_graph_set(int i, int zero_or_one);
+int led_bar_graph_set(int i, int zero_or_one);
 
 #endif

@@ -52,7 +52,7 @@ void led_bar_graph_destroy(){
 }
 
 
-int led_gar_graph_set(int i, int zero_or_one){
+int led_bar_graph_set(int i, int zero_or_one){
     i = max(min(i, LED_BAR_GRAPH_GPIO_NUM-1), 0);
     if(!initted){
         if(!led_bar_graph_init()){

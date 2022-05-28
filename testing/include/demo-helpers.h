@@ -20,6 +20,8 @@ double randDouble(double min, double max);
 
 
 // argument parsing
+int smallHash(char * str);
+
 int getNARgs(char **cursor, char **cursorNext, int n, ...);
 
 int argGenerator(char **cursor, char **cursorNext);

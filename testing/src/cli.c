@@ -8,11 +8,11 @@
 #include "gpio-led-demos/gpio-led-demos.h"
 
 void cli(){
-    size_t buff_size = 10;
-    char *buffer = malloc(buff_size*sizeof(char));
+    size_t buffSize = 64;
+    char *buffer = malloc(buffSize*sizeof(char));
 
-    //sensehat_cli(buffer);
-    gpio_led_cli(buffer);
+    //sensehat_cli(buffer, buffSize);
+    gpio_led_cli(buffer, &buffSize);
 
     free(buffer); 
 }

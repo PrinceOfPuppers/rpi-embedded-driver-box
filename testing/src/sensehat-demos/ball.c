@@ -9,7 +9,7 @@
 #include "sensehat.h"
 #include "driver-box-helpers.h"
 #include "demo-helpers.h"
-#incldue "sigint-handler.h"
+#include "sigint-handler.h"
 
 
 void bouncyBall(uint16_t *map, int *stopSig, double r, double g, double b){
@@ -117,6 +117,6 @@ int popBall(Balls *balls){
     return 1;
 }
 
-int stopBalls(Balls *balls){
-    while(popBall()){}
+void stopBalls(Balls *balls){
+    while(popBall(balls)){}
 }

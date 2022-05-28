@@ -63,7 +63,7 @@ void colorLine(uint16_t * map, int startX, int startY, int endX, int endY, doubl
 }
 
 
-void sensehat_cli(char *buff){
+void sensehat_cli(char *buffer, size_t *buffSize){
     uint16_t *map = getLedArr();
 
     time_t t;
@@ -88,7 +88,7 @@ void sensehat_cli(char *buff){
 
     while(!sigint_triggered){
         printf("~ ");
-        buffSize = getline(&buffer,&buffSize,stdin);
+        *buffSize = getline(&buffer, buffSize, stdin);
         cursor     = buffer;
         cursorNext = buffer;
 
@@ -255,7 +255,7 @@ void sensehat_cli(char *buff){
 
 
             case 113:{ //quit
-                return;
+                goto sensehat_cli_cleanup;
             }
 
 
@@ -334,11 +334,12 @@ void sensehat_cli(char *buff){
 
     }
 
+    sensehat_cli_cleanup:
     stopDigitalRain();
     stopBalls(&balls);
 
-    clear(ledMatrix);
-    unmapLedArr(ledMatrix);
+    clear(map);
+    unmapLedArr(map);
     return;
 }
 

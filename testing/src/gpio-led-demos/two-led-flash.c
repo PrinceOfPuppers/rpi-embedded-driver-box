@@ -1,6 +1,9 @@
 #include "gpio-led-demos/two-led-flash.h"
 
 #include <pthread.h>
+#include <errno.h>
+#include <stdio.h>
+#include <unistd.h>
 
 #include "sigint-handler.h"
 #include "gpio.h"
@@ -49,23 +52,23 @@ pthread_t tId;
 int _stop_sig;
 int inited;
 
-void *two_led_flash_thread(void *){
+void *two_led_flash_thread(void *_){
     two_led_flash(&_stop_sig);
 
     return NULL;
 }
 
 void stop_two_led_flash(){
-    if(inited && !_stopSig){
-        _stopSig = 1;
+    if(inited && !_stop_sig){
+        _stop_sig = 1;
         pthread_join(tId, NULL);
     }
 }
 
 int start_two_led_flash(){
     stop_two_led_flash();
-    _stopSig = 0;
-    int error = pthread_create(&tId, NULL, two_led_flash_thread);
+    _stop_sig = 0;
+    int error = pthread_create(&tId, NULL, two_led_flash_thread, NULL);
     if (error) {
         return 0;
     }

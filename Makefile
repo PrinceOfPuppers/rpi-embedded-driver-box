@@ -15,7 +15,7 @@ FILENAMES = $(basename $(notdir $(wildcard $(SRC)/*.c) ))
 
 # Testing exclusive
 TESTDIR = testing
-TESTFILES = $(wildcard $(TESTDIR)/$(SRC)/*.c)
+TESTFILES = $(wildcard $(TESTDIR)/$(SRC)/*.c) $(wildcard $(TESTDIR)/$(SRC)/*/*.c)
 TESTINCLUDE = -I$(TESTDIR)/include
 TESTBUILD = build
 TESTPROGRAM = test
