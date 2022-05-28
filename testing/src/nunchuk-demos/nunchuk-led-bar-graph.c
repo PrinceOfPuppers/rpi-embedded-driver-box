@@ -14,29 +14,29 @@
 #include "led-bar-graph.h"
 
 
-int nunchuk_led_bar_graph(){
+int nunchuk_led_bar_graph(int *stop_sig){
     int err = 0;
     Nunchuk_Data n;
 
     int prev_num = 0;
     int num;
 
-    while(!sigint_triggered){
+    while(!sigint_triggered && !*stop_sig){
+        usleep(NUNCHUK_MIN_POLLING_TIME_MICROSECONDS);
         if(!get_nunchuk(&n)){continue;};
         num = (int)((( (float)(n.joystick_y + 1) ) / 2.0) * (float)LED_BAR_GRAPH_GPIO_NUM  + 0.2);
         num = max(min(num, LED_BAR_GRAPH_GPIO_NUM -1), 0);
 
-        if (led_bar_graph_set(prev_num, 0)) {
+        if (!led_bar_graph_set(prev_num, 0)) {
             err = 1; 
             goto nunchuk_led_bar_graph_test_end;
         }
-        if (led_bar_graph_set(num, 1)) {
+        if (!led_bar_graph_set(num, 1)) {
             err = 1; 
             goto nunchuk_led_bar_graph_test_end;
         }
 
         prev_num = num;
-        usleep(NUNCHUK_MIN_POLLING_TIME_MICROSECONDS);
     }
 
     nunchuk_led_bar_graph_test_end:

@@ -89,6 +89,7 @@ void sensehat_cli(char *buffer, size_t *buffSize){
         printf("\nSenseHat Demos (type help for options):\n");
         printf("~ ");
         *buffSize = getline(&buffer, buffSize, stdin);
+        if(sigint_triggered){break;}
         cursor     = buffer;
         cursorNext = buffer;
 

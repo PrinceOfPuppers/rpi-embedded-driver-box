@@ -2,10 +2,10 @@
 
 #include <stdint.h>
 #include <stdio.h>
-#include <unistd.h>				//Needed for I2C port
-#include <fcntl.h>				//Needed for I2C port
-#include <sys/ioctl.h>			//Needed for I2C port
-#include <linux/i2c-dev.h>		//Needed for I2C port
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/ioctl.h>
+#include <linux/i2c-dev.h>
 
 #include "driver-box-helpers.h"
 
@@ -83,9 +83,9 @@ int write_i2c(int file_i2c, int len){
 
 
 int _get_raw(){
-    //buff[0] = 0x00;
-    //if(!write_i2c(nunchuk_file_i2c, 1)){return 0;}
-    //usleep(10);
+    buff[0] = 0x00;
+    if(!write_i2c(nunchuk_file_i2c, 1)){return 0;}
+    usleep(200);
     if(!read_i2c(nunchuk_file_i2c, NUNCHUK_PACKET_SIZE)){return 0;}
     return 1;
 }
@@ -139,10 +139,7 @@ int get_nunchuk( Nunchuk_Data *n ){
 
 int print_nunchuk(){
     Nunchuk_Data n;
-    if(!calibrated){
-        if(!init_nunchuk()){return 0;}
-    }
-    get_nunchuk(&n);
+    if(!get_nunchuk(&n)){return 0;};
     printf(
         "Nunchuk:\n"
         "    joystick x: %lf\n"

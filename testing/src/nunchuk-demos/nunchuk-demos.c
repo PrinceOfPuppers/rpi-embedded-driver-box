@@ -21,6 +21,7 @@ void nunchuk_cli(char *buffer, size_t *buffSize){
         printf("\nNunchuk Demos (type help for options):\n");
         printf("~ ");
         *buffSize = getline(&buffer, buffSize, stdin);
+        if(sigint_triggered){break;}
         cursor     = buffer;
         cursorNext = buffer;
 
@@ -29,24 +30,24 @@ void nunchuk_cli(char *buffer, size_t *buffSize){
         switch(smallHash(cursor)){
 
             case 634:{ // bar
-                print_nunchuk();
-                break;
-            }
-
-            case 1909:{ // rmbar
-                print_nunchuk_raw();
-                break;
-            }
-
-
-            case 1912:{ // flash
                 start_nunchuk_led_bar_graph();
                 break;
             }
 
-
-            case 4474:{ // rmflash
+            case 1909:{ // rmbar
                 stop_nunchuk_led_bar_graph();
+                break;
+            }
+
+
+            case 1127:{ // data
+                print_nunchuk();
+                break;
+            }
+
+
+            case 4381:{ // rawdata
+                print_nunchuk_raw();
                 break;
             }
 
@@ -77,5 +78,6 @@ void nunchuk_cli(char *buffer, size_t *buffSize){
     }
     
     nunchuk_cli_clean_up:
+    stop_nunchuk_led_bar_graph();
     destroy_nunchuk();
 }

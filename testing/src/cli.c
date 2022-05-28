@@ -6,6 +6,7 @@
 #include "demo-helpers.h"
 #include "sigint-handler.h"
 #include "sensehat-demos/sensehat-demos.h"
+#include "nunchuk-demos/nunchuk-demos.h"
 #include "gpio-led-demos/gpio-led-demos.h"
 
 void cli(){
@@ -26,11 +27,11 @@ void cli(){
         printf("\nInteractive Demos (type help to see options):\n");
         printf("~ ");
         buffSize = getline(&buffer, &buffSize, stdin);
+        if(sigint_triggered){break;}
         cursor     = buffer;
         cursorNext = buffer;
 
         argGenerator(&cursor,&cursorNext);
-        printf("%s: %i\n", cursor, smallHash(cursor));
         switch(smallHash(cursor)){
 
             case 1185:{ // leds
@@ -45,10 +46,9 @@ void cli(){
 
 
             case 4575:{ // nunchuk
+                nunchuk_cli(buffer, &buffSize);
                 break;
             }
-
-
 
             case 113:{ // q
                 goto toplevel_cli_cleanup;

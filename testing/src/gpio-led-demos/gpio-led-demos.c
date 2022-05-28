@@ -16,6 +16,7 @@ void gpio_led_cli(char *buffer, size_t *buffSize){
         printf("\nGPIO LED Demos (type help for options):\n");
         printf("~ ");
         *buffSize = getline(&buffer, buffSize, stdin);
+        if(sigint_triggered){break;}
         cursor     = buffer;
         cursorNext = buffer;
 
