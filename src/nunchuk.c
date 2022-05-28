@@ -13,7 +13,8 @@
 int inited = 0;
 int calibrated = 0;
 int nunchuk_file_i2c;
-uint8_t buff[6] = {0};
+#define NUNCHUK_PACKET_SIZE 6
+uint8_t buff[NUNCHUK_PACKET_SIZE] = {0};
 
 double joystick_x_cali;
 double joystick_y_cali;
@@ -32,15 +33,13 @@ int open_i2c_bus(char *filename, int i2c_addr){
     int file_i2c = open(filename, O_RDWR);
     if (file_i2c < 0)
     {
-        //ERROR HANDLING: you can check errno to see what went wrong
-        printf("Failed to open the i2c bus\n");
+        printf("i2c: failed to open bus\n");
         return -1;
     }
 
     if (ioctl(file_i2c, I2C_SLAVE, i2c_addr) < 0)
     {
-        printf("Failed to acquire bus access and/or talk to slave.\n");
-        //ERROR HANDLING; you can check errno to see what went wrong
+        printf("i2c: failed to talk to device\n");
         return -1;
     }
 
@@ -50,11 +49,9 @@ int open_i2c_bus(char *filename, int i2c_addr){
 
 
 int read_i2c(int file_i2c, int len){
-    //----- READ BYTES -----
-    if (read(file_i2c, buff, len) != len)		//read() returns the number of bytes actually read, if it doesn't match then an error occurred (e.g. no response from the device)
+    if (read(file_i2c, buff, len) != len)
     {
-        //ERROR HANDLING: i2c transaction failed
-        printf("Failed to read from the i2c bus.\n");
+        printf("i2c: failed to read bus\n");
         return 0;
     }
     else
@@ -71,7 +68,7 @@ int read_i2c(int file_i2c, int len){
 }
 
 int write_i2c(int file_i2c, int len){
-    if (write(file_i2c, buff, len) != len)		//write() returns the number of bytes actually written, if it doesn't match then an error occurred (e.g. no response from the device)
+    if (write(file_i2c, buff, len) != len)
     {
         printf("Failed to write to the i2c bus.\n");
         return 0;
@@ -89,7 +86,7 @@ int _get_raw(){
     //buff[0] = 0x00;
     //if(!write_i2c(nunchuk_file_i2c, 1)){return 0;}
     //usleep(10);
-    if(!read_i2c(nunchuk_file_i2c, 6)){return 0;}
+    if(!read_i2c(nunchuk_file_i2c, NUNCHUK_PACKET_SIZE)){return 0;}
     return 1;
 }
 
@@ -110,7 +107,7 @@ int init_nunchuk(){
         if(!write_i2c(nunchuk_file_i2c, 2)){return 0;}
 
         inited = 1;
-        usleep(MIN_STARTUP_TIME_MICROSECONDS);
+        usleep(NUNCHUK_MIN_STARTUP_TIME_MICROSECONDS);
     }
 
     if(!_get_raw()){return 0;};
@@ -121,7 +118,11 @@ int init_nunchuk(){
     return 1;
 }
 
-int get_nunchuk( Nunchuk *n ){
+void destroy_nunchuk(){
+    close(nunchuk_file_i2c);
+}
+
+int get_nunchuk( Nunchuk_Data *n ){
     if(!calibrated){
         if(!init_nunchuk()){return 0;}
     }
@@ -136,3 +137,34 @@ int get_nunchuk( Nunchuk *n ){
     return 1;
 }
 
+int print_nunchuk(){
+    Nunchuk_Data n;
+    if(!calibrated){
+        if(!init_nunchuk()){return 0;}
+    }
+    get_nunchuk(&n);
+    printf(
+        "Nunchuk:\n"
+        "    joystick x: %lf\n"
+        "    joystick y: %lf\n"
+        "    c button  : %i\n"
+        "    z button  : %i\n",
+        n.joystick_x, n.joystick_y, n.c, n.z);
+
+    return 1;
+}
+
+int print_nunchuk_raw(){
+    if(!calibrated){
+        if(!init_nunchuk()){return 0;}
+    }
+    else{
+        if(!_get_raw()){return 0;}
+    }
+
+    for(int i=0; i<NUNCHUK_PACKET_SIZE; i++){
+        printf("Data[%i]: ", i);
+        printBin(buff[i]);
+    }
+    return 1;
+}

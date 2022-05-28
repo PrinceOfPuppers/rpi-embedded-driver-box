@@ -3,10 +3,10 @@
 
 #define NUNCHUK_DEBUG 0
 
-#define MIN_POLLING_TIME_MICROSECONDS 50000
-#define MIN_STARTUP_TIME_MICROSECONDS 1000000
+#define NUNCHUK_MIN_POLLING_TIME_MICROSECONDS 50000
+#define NUNCHUK_MIN_STARTUP_TIME_MICROSECONDS 1000000
 
-struct Nunchuk{
+struct Nunchuk_Data{
     // all from -1 to 1
     double joystick_x;
     double joystick_y;
@@ -18,8 +18,16 @@ struct Nunchuk{
     int c; // pressed == true
     int z; // pressed == true
 };
-typedef struct Nunchuk Nunchuk;
+typedef struct Nunchuk_Data Nunchuk_Data;
 
-int get_nunchuk(Nunchuk* n);
+int init_nunchuk();
+
+void destroy_nunchuk();
+
+int get_nunchuk(Nunchuk_Data* n);
+
+int print_nunchuk();
+
+int print_nunchuk_raw();
 
 #endif
