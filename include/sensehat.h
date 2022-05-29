@@ -4,6 +4,7 @@
 #include <stdint.h>
 
 #define LED_MATRIX_NUM_LEDS 64
+#define LED_MATRIX_WIDTH 8
 #define LED_MATRIX_FILESIZE (LED_MATRIX_NUM_LEDS * sizeof(uint16_t))
 
 int init_sensehat_led_matrix();

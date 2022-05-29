@@ -3,6 +3,7 @@
 #include <stdio.h>
 
 #include "nunchuk-demos/nunchuk-led-bar-graph.h"
+#include "nunchuk-demos/nunchuk-sensehat.h"
 #include "nunchuk.h"
 #include "demo-helpers.h"
 #include "sigint-handler.h"
@@ -41,6 +42,15 @@ void nunchuk_cli(char *buffer, size_t *buffSize){
                 break;
             }
 
+            case 3276:{ // matrix
+                start_nunchuk_sensehat();
+                break;
+            }
+
+            case 6615:{ // rmmatrix
+                stop_nunchuk_sensehat();
+                break;
+            }
 
             case 1127:{ // data
                 print_nunchuk();
@@ -81,5 +91,6 @@ void nunchuk_cli(char *buffer, size_t *buffSize){
     
     nunchuk_cli_clean_up:
     stop_nunchuk_led_bar_graph();
+    stop_nunchuk_sensehat();
     destroy_nunchuk();
 }

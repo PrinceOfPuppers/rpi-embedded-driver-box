@@ -77,7 +77,7 @@ void destroy_sensehat_led_matrix(){
 }
 
 void led_matrix_set_val(int x, int y, uint16_t val){
-    led_matrix[8*y+x] = val;
+    led_matrix[LED_MATRIX_WIDTH*y+x] = val;
 }
 
 void led_matrix_clear(){

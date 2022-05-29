@@ -17,6 +17,7 @@
     _a < _b ? _a : _b;       \
 })
 
+#define clamp(val, a, b) min(max(val, a), b)
 
 void printBin(char a);
 
