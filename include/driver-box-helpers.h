@@ -17,4 +17,7 @@
     _a < _b ? _a : _b;       \
 })
 
+
+void printBin(char a);
+
 #endif

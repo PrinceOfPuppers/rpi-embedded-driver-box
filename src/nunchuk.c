@@ -1,13 +1,11 @@
 #include "nunchuk.h"
 
 #include <stdint.h>
-#include <stdio.h>
 #include <unistd.h>
-#include <fcntl.h>
-#include <sys/ioctl.h>
-#include <linux/i2c-dev.h>
+#include <stdio.h>
 
 #include "driver-box-helpers.h"
+#include "i2c.h"
 
 
 int inited = 0;
@@ -19,74 +17,11 @@ uint8_t buff[NUNCHUK_PACKET_SIZE] = {0};
 double joystick_x_cali;
 double joystick_y_cali;
 
-
-void printBin(char a){
-    for (int j = 0; j < 8; j++) {
-        printf("%d", !!(( a << j) & 0x80));
-    }
-    printf("\n");
-}
-
-
-int open_i2c_bus(char *filename, int i2c_addr){
-    //----- OPEN THE I2C BUS -----
-    int file_i2c = open(filename, O_RDWR);
-    if (file_i2c < 0)
-    {
-        printf("i2c: failed to open bus\n");
-        return -1;
-    }
-
-    if (ioctl(file_i2c, I2C_SLAVE, i2c_addr) < 0)
-    {
-        printf("i2c: failed to talk to device\n");
-        return -1;
-    }
-
-    return file_i2c;
-}
-
-
-
-int read_i2c(int file_i2c, int len){
-    if (read(file_i2c, buff, len) != len)
-    {
-        printf("i2c: failed to read bus\n");
-        return 0;
-    }
-    else
-    {
-        #if(NUNCHUK_DEBUG)
-        for(int i=0; i<len; i++){
-            printf("Data[%i]: ", i);
-            printBin(buff[i]);
-        }
-        #endif
-
-        return 1;
-    }
-}
-
-int write_i2c(int file_i2c, int len){
-    if (write(file_i2c, buff, len) != len)
-    {
-        printf("Failed to write to the i2c bus.\n");
-        return 0;
-    }
-
-    #if(NUNCHUK_DEBUG)
-    printf("wrote to i2c bus.\n");
-    #endif
-
-    return 1;
-}
-
-
 int _get_raw(){
     buff[0] = 0x00;
-    if(!write_i2c(nunchuk_file_i2c, 1)){return 0;}
+    if(!write_i2c(nunchuk_file_i2c, buff, 1)){return 0;}
     usleep(200);
-    if(!read_i2c(nunchuk_file_i2c, NUNCHUK_PACKET_SIZE)){return 0;}
+    if(!read_i2c(nunchuk_file_i2c, buff, NUNCHUK_PACKET_SIZE)){return 0;}
     return 1;
 }
 
@@ -100,11 +35,11 @@ int init_nunchuk(){
 
         buff[0] = 0xf0;
         buff[1] = 0x55;
-        if(!write_i2c(nunchuk_file_i2c, 2)){return 0;}
+        if(!write_i2c(nunchuk_file_i2c, buff, 2)){return 0;}
 
         buff[0] = 0xfb;
         buff[1] = 0x00;
-        if(!write_i2c(nunchuk_file_i2c, 2)){return 0;}
+        if(!write_i2c(nunchuk_file_i2c, buff, 2)){return 0;}
 
         inited = 1;
         usleep(NUNCHUK_MIN_STARTUP_TIME_MICROSECONDS);
@@ -119,7 +54,7 @@ int init_nunchuk(){
 }
 
 void destroy_nunchuk(){
-    close(nunchuk_file_i2c);
+    close_i2c_bus(nunchuk_file_i2c);
 }
 
 int get_nunchuk( Nunchuk_Data *n ){
