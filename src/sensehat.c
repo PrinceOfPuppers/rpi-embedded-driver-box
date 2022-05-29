@@ -15,7 +15,7 @@
 
 #define DEV_PATH_FMT "/dev/fb%c"
 
-int fd;
+static int fd;
 
 uint16_t *getLedArr(){
     uint16_t *ledArr;

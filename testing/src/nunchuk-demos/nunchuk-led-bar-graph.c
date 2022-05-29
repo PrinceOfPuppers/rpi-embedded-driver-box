@@ -22,7 +22,7 @@ int nunchuk_led_bar_graph(int *stop_sig){
     int num;
 
     while(!sigint_triggered && !*stop_sig){
-        usleep(NUNCHUK_MIN_POLLING_TIME_MICROSECONDS);
+        usleep(NUNCHUK_POLLING_TIME_MICROSECONDS);
         if(!get_nunchuk(&n)){continue;};
         num = (int)((( (float)(n.joystick_y + 1) ) / 2.0) * (float)LED_BAR_GRAPH_GPIO_NUM  + 0.2);
         num = max(min(num, LED_BAR_GRAPH_GPIO_NUM -1), 0);
@@ -48,9 +48,9 @@ int nunchuk_led_bar_graph(int *stop_sig){
     return 0;
 }
 
-pthread_t tId;
-int _stop_sig;
-int inited;
+static pthread_t tId;
+static int _stop_sig;
+static int inited;
 
 void *nunchuk_led_bar_graph_thread(void *_){
     nunchuk_led_bar_graph(&_stop_sig);

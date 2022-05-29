@@ -80,10 +80,10 @@ void *digitalRainThread(void *_b){
     return NULL;
 }
 
-pthread_t tId;
-int _stopSig;
+static pthread_t tId;
+static int _stopSig;
 
-int inited;
+static int inited;
 
 void stopDigitalRain(){
     if(inited && !_stopSig){

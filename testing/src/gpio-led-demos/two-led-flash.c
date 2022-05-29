@@ -44,9 +44,9 @@ int two_led_flash(int *stop_sig){
 }
 
 
-pthread_t tId;
-int _stop_sig;
-int inited;
+static pthread_t tId;
+static int _stop_sig;
+static int inited;
 
 void *two_led_flash_thread(void *_){
     two_led_flash(&_stop_sig);

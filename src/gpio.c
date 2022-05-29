@@ -11,7 +11,7 @@
 #define GPIO_VALUE_FMT "/sys/class/gpio/gpio%s/value"
 
 #define MAX_PIN_STR_SIZE 12
-char pin_num_buff[MAX_PIN_STR_SIZE];
+static char pin_num_buff[MAX_PIN_STR_SIZE];
 
 int _export_pin(int export_fd, int pin_num_len, char *direction, int direction_len){
     int fd;

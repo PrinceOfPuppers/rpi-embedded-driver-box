@@ -6,8 +6,8 @@
 #include "driver-box-helpers.h"
 #include "gpio.h"
 
-int fds[LED_BAR_GRAPH_GPIO_NUM];
-int initted = 0;
+static int fds[LED_BAR_GRAPH_GPIO_NUM];
+static int initted = 0;
 
 int led_bar_graph_init(){
     if(initted){

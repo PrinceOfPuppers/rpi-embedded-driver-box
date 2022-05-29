@@ -14,6 +14,8 @@ void nunchuk_cli(char *buffer, size_t *buffSize){
         return;
     };
 
+    start_nunchuk_polling();
+
     char *cursor    ;
     char *cursorNext;
 

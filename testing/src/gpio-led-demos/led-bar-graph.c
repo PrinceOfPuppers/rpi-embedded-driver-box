@@ -38,9 +38,9 @@ int led_bar_graph(int *stop_sig){
     return 0;
 }
 
-pthread_t tId;
-int _stop_sig;
-int inited;
+static pthread_t tId;
+static int _stop_sig;
+static int inited;
 
 void *led_bar_graph_thread(void *_){
     led_bar_graph(&_stop_sig);
