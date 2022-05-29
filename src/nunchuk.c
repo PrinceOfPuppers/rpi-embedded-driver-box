@@ -126,6 +126,8 @@ void destroy_nunchuk(){
     pthread_mutex_destroy(&out_buff_lock);
     pthread_mutex_destroy(&in_buff_lock);
     close_i2c_bus(nunchuk_file_i2c);
+    inited = 0;
+    calibrated = 0;
 }
 
 #define nunchuk_clamp(val) max( min(val, 1L), -1L)
