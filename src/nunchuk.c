@@ -11,6 +11,7 @@
 int inited = 0;
 int calibrated = 0;
 int nunchuk_file_i2c;
+
 #define NUNCHUK_PACKET_SIZE 6
 uint8_t buff[NUNCHUK_PACKET_SIZE] = {0};
 
@@ -57,6 +58,8 @@ void destroy_nunchuk(){
     close_i2c_bus(nunchuk_file_i2c);
 }
 
+#define nunchuk_clamp(val) max( min(val, 1L), -1L)
+
 int get_nunchuk( Nunchuk_Data *n ){
     if(!calibrated){
         if(!init_nunchuk()){return 0;}
@@ -65,10 +68,16 @@ int get_nunchuk( Nunchuk_Data *n ){
         if(!_get_raw()){return 0;}
     }
 
-    n->joystick_x = max( min( ((double)buff[0] - joystick_x_cali)/96L ,1L ), -1L );
-    n->joystick_y = max( min( ((double)buff[1] - joystick_y_cali)/96L ,1L ), -1L );
+    n->joystick_x = nunchuk_clamp( ((double)buff[0] - joystick_x_cali)/96L );
+    n->joystick_y = nunchuk_clamp( ((double)buff[1] - joystick_y_cali)/96L );
+
     n->c = (buff[5] & 0x02) == 0x00;
     n->z = (buff[5] & 0x01) == 0x00;
+
+    n->acc_x = nunchuk_clamp(( (double)(( buff[2] << 2 ) | ((buff[5] >> 2) & 0x03)) - 512L ) / 512L);
+    n->acc_y = nunchuk_clamp(( (double)(( buff[3] << 2 ) | ((buff[5] >> 4) & 0x03)) - 512L ) / 512L);
+    n->acc_z = nunchuk_clamp(( (double)(( buff[4] << 2 ) | ((buff[5] >> 6) & 0x03)) - 512L ) / 512L);
+
     return 1;
 }
 
@@ -79,9 +88,12 @@ int print_nunchuk(){
         "Nunchuk:\n"
         "    joystick x: %lf\n"
         "    joystick y: %lf\n"
+        "    acceler x : %lf\n"
+        "    acceler y : %lf\n"
+        "    acceler z : %lf\n"
         "    c button  : %i\n"
         "    z button  : %i\n",
-        n.joystick_x, n.joystick_y, n.c, n.z);
+        n.joystick_x, n.joystick_y, n.acc_x, n.acc_y, n.acc_z, n.c, n.z);
 
     return 1;
 }

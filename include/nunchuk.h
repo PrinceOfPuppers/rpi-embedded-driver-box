@@ -11,9 +11,9 @@ struct Nunchuk_Data{
     double joystick_x;
     double joystick_y;
 
-    //double acc_x;
-    //double acc_y;
-    //double acc_z;
+    double acc_x;
+    double acc_y;
+    double acc_z;
 
     int c; // pressed == true
     int z; // pressed == true
