@@ -12,7 +12,7 @@
 #include "sigint-handler.h"
 
 
-void bouncyBall(uint16_t *map, int *stopSig, double r, double g, double b){
+static void bouncyBall(int *stopSig, double r, double g, double b){
     double x = (double)randInt(0, 7);
     double y = (double)randInt(0, 7);
 
@@ -27,7 +27,7 @@ void bouncyBall(uint16_t *map, int *stopSig, double r, double g, double b){
 
     int frameTime = 200;
     while(!*stopSig && !sigint_triggered){
-        blitpixel(map, x, y, r, g, b);
+        blit_pixel(x, y, r, g, b);
 
         x += startVelX;
         y += startVelY;
@@ -52,37 +52,34 @@ void bouncyBall(uint16_t *map, int *stopSig, double r, double g, double b){
 
         usleep(frameTime);
     }
-    blitpixel(map, x, y, 0.0, 0.0, 0.0);
+    blit_pixel(x, y, 0.0, 0.0, 0.0);
 }
 
 typedef struct BallThreadData {
-    uint16_t *map;
     int      *stopSig;
     double r;
     double g;
     double b;
 } BallThreadData;
 
-void *ballThread(void *_b){
+static void *ballThread(void *_b){
     BallThreadData *ballData = _b;
 
-    uint16_t *map     = ballData->map;
     int      *stopSig = ballData->stopSig;
     double     r       = ballData->r;
     double     g       = ballData->g;
     double     b       = ballData->b;
 
     free(ballData);
-    bouncyBall(map, stopSig, r, g, b);
+    bouncyBall(stopSig, r, g, b);
 
     return NULL;
 }
 
-int spawnBall(uint16_t *map, pthread_t *tId, int *stopSig, double r, double g, double b){
+static int spawnBall(pthread_t *tId, int *stopSig, double r, double g, double b){
     BallThreadData *ballData = malloc(sizeof(BallThreadData));
     *stopSig = 0;
 
-    ballData->map      = map;
     ballData->stopSig  = stopSig;
     ballData->r        = r;
     ballData->g        = g;
@@ -97,13 +94,13 @@ int spawnBall(uint16_t *map, pthread_t *tId, int *stopSig, double r, double g, d
     return 1;
 }
 
-int pushBall(Balls *balls, uint16_t *map, double r, double g, double b){
+int pushBall(Balls *balls, double r, double g, double b){
     if(balls->_nextBall > MAX_BALLS){
         return 0;
     }
     pthread_t *tId     = &(balls->_btIDs[balls->_nextBall]);
     int *stopSig = &(balls->_stopSigs[balls->_nextBall]);
-    spawnBall(map, tId, stopSig, r, g, b);
+    spawnBall(tId, stopSig, r, g, b);
     balls->_nextBall += 1;
     return 1;
 }

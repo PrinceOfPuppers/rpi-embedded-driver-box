@@ -8,7 +8,7 @@
 #include "sigint-handler.h"
 #include "gpio.h"
 
-int two_led_flash(int *stop_sig){
+static int two_led_flash(int *stop_sig){
     int fd1 = export_pin(LED_FLASH_GPIO_PIN_1, "out");
     int fd2 = export_pin(LED_FLASH_GPIO_PIN_2, "out");
     if (fd1 < 0 || fd2 < 0){return 1;}
@@ -48,7 +48,7 @@ static pthread_t tId;
 static int _stop_sig;
 static int inited;
 
-void *two_led_flash_thread(void *_){
+static void *two_led_flash_thread(void *_){
     two_led_flash(&_stop_sig);
 
     return NULL;

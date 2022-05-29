@@ -17,54 +17,11 @@
 #include "sigint-handler.h"
 
 
-int rasterLineGenerator(int *x, int *y, int endX, int endY){
-    if(*x == endX && *y == endY){ return 0; }
-
-    double diffX = (double)(endX - *x);
-    double diffY = (double)(endY - *y);
-
-    if(endX != *x){
-        double slope = diffY/diffX;
-        if(slope < -0.25 || slope > 0.25){
-            if (diffY > 0){
-                *y+=1;
-            }
-            else{
-                *y-=1;
-            }
-        }
-
-        if(slope > -4 && slope < 4){
-            if (diffX > 0){
-                *x+=1;
-            }
-            else{
-                *x-=1;
-            }
-        }
-        return 1;
-    }
-
-    if (diffY > 0){
-        *y+=1;
-    }
-    else{
-        *y-=1;
-    }
-    return 1;
-}
-
-void colorLine(uint16_t * map, int startX, int startY, int endX, int endY, double r, double g, double b){
-    printf("Setting Pixels on Line from (%i,%i) to (%i, %i) (r,g,b): (%f, %f, %f)\n",startX,startY,endX,endY,r,g,b);
-    setVal(map,startX,startY,rgbDoubleToHex(r,g,b));
-    while(rasterLineGenerator(&startX, &startY, endX, endY)){
-        setVal(map,startX,startY,rgbDoubleToHex(r,g,b));
-    }
-}
-
 
 void sensehat_cli(char *buffer, size_t *buffSize){
-    uint16_t *map = getLedArr();
+    if(!init_sensehat_led_matrix()){
+        return;
+    }
 
     time_t t;
     srand((unsigned) time(&t));
@@ -110,7 +67,7 @@ void sensehat_cli(char *buffer, size_t *buffSize){
 
                 if(fixed){
                     printf("Setting x: %i y: %i to fixed (r,g,b): (%f, %f, %f)\n",x,y,fixr,fixg,fixb);
-                    setVal(map,x,y,rgbDoubleToHex(fixr,fixg,fixb));
+                    led_matrix_set_val(x,y,rgb_double_to_hex(fixr,fixg,fixb));
                     continue;
                 }
 
@@ -123,7 +80,7 @@ void sensehat_cli(char *buffer, size_t *buffSize){
                 double b = (double)atof(arg3);
 
                 printf("Setting x: %i y: %i to (r,g,b): (%f, %f, %f)\n",x,y,r,g,b);
-                setVal(map,x,y,rgbDoubleToHex(r,g,b));
+                led_matrix_set_val(x,y,rgb_double_to_hex(r,g,b));
                 break;
             }
 
@@ -144,7 +101,8 @@ void sensehat_cli(char *buffer, size_t *buffSize){
                 int endY = atoi(arg4);
 
                 if(fixed){
-                    colorLine(map, x, y, endX, endY, fixr, fixg, fixb);
+                    printf("Setting Pixels on Line from (%i,%i) to (%i, %i) (r,g,b): (%f, %f, %f)\n",x,y,endX,endY,fixr,fixg,fixb);
+                    blit_colored_line(x, y, endX, endY, fixr, fixg, fixb);
                     continue;
                 }
                 if(!getNARgs(&cursor, &cursorNext, 3, &arg1, &arg2, &arg3)){
@@ -155,13 +113,14 @@ void sensehat_cli(char *buffer, size_t *buffSize){
                 double g = (double)atof(arg2);
                 double b = (double)atof(arg3);
 
-                colorLine(map, x, y, endX, endY, r, g, b);
+                printf("Setting Pixels on Line from (%i,%i) to (%i, %i) (r,g,b): (%f, %f, %f)\n",x,y,endX,endY,r,g,b);
+                blit_colored_line(x, y, endX, endY, r, g, b);
                 break;
             }
 
             case 1156:{ // ball
                 if(fixed){
-                    if(!pushBall(&balls, map, fixr, fixg, fixb)){
+                    if(!pushBall(&balls, fixr, fixg, fixb)){
                         printf("Unable to Spawn Ball\n");
                     };
                     printf("Spawning Ball\n");
@@ -175,7 +134,7 @@ void sensehat_cli(char *buffer, size_t *buffSize){
                 double r = (double)atof(arg1);
                 double g = (double)atof(arg2);
                 double b = (double)atof(arg3);
-                if(!pushBall(&balls, map, r, g, b)){
+                if(!pushBall(&balls, r, g, b)){
                     printf("Unable to Spawn Ball\n");
                     break;
                 };
@@ -187,7 +146,7 @@ void sensehat_cli(char *buffer, size_t *buffSize){
             case 1173:{ //rain
                 if(fixed){
                     
-                    if(!startDigitalRain(map, fixr, fixg, fixb)){
+                    if(!startDigitalRain(fixr, fixg, fixb)){
                         printf("Unable to Start Digital Rain\n");
                     };
                     printf("Starting Digital Rain\n");
@@ -202,7 +161,7 @@ void sensehat_cli(char *buffer, size_t *buffSize){
                 double g = (double)atof(arg2);
                 double b = (double)atof(arg3);
 
-                if(!startDigitalRain(map, r, g, b)){
+                if(!startDigitalRain(r, g, b)){
                     printf("Unable to Start Digital Rain\n");
                 };
                 printf("Starting Digital Rain\n");
@@ -248,7 +207,7 @@ void sensehat_cli(char *buffer, size_t *buffSize){
 
             case 657:{ // clr
                 printf("Clearing\n");
-                clear(map);
+                led_matrix_clear();
                 break;
             }
 
@@ -325,8 +284,8 @@ void sensehat_cli(char *buffer, size_t *buffSize){
                 double b = (double)atof(arg3);
 
                 printf("Filling with (r,g,b): (%f, %f, %f)\n",r,g,b);
-                uint16_t value = rgbDoubleToHex(r,g,b);
-                fill(map,value);
+                uint16_t value = rgb_double_to_hex(r,g,b);
+                led_matrix_fill(value);
                 break;
             }
 
@@ -347,8 +306,8 @@ void sensehat_cli(char *buffer, size_t *buffSize){
     stopDigitalRain();
     stopBalls(&balls);
 
-    clear(map);
-    unmapLedArr(map);
+    //led_matrix_clear();
+    destroy_sensehat_led_matrix();
     return;
 }
 

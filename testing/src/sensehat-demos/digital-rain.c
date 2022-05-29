@@ -13,7 +13,7 @@
 #include "sigint-handler.h"
 
 
-double tailOpacityCurve(double y, int ledY, double tailLen){
+static double tailOpacityCurve(double y, int ledY, double tailLen){
     if (ledY > y){
         return mathMax(1 - fabs(((double)ledY-8-y) / tailLen), 0.0); // handle screenwrapping
     }
@@ -21,17 +21,17 @@ double tailOpacityCurve(double y, int ledY, double tailLen){
     return mathMax(1 - fabs(((double)ledY-y) / tailLen), 0.0);
 }
 
-void setDRainDrop(uint16_t *map, int x, double y, int tailLen, double r, double g, double b){
+static void setDRainDrop(int x, double y, int tailLen, double r, double g, double b){
     int headY = (int)trunc(y);
 
     for(int i = 0; i < tailLen; i ++){
         int ledY = mathMod(headY - i, 8);
         double opacity = tailOpacityCurve(y, ledY, tailLen);
-        setVal(map, x, (7-ledY), rgbDoubleToHex(opacity*r, opacity*g, opacity*b));
+        led_matrix_set_val(x, (7-ledY), rgb_double_to_hex(opacity*r, opacity*g, opacity*b));
     }
 }
 
-void digitalRain(uint16_t *map, int *stopSig, double r, double g, double b){
+static void digitalRain(int *stopSig, double r, double g, double b){
     double tailLen = 4.0;
     double dropYs[8];
     double dropVels[8];
@@ -46,36 +46,34 @@ void digitalRain(uint16_t *map, int *stopSig, double r, double g, double b){
         for(int i = 0; i < 8; i++){
             dropYs[i] += dropVels[i];
             dropYs[i] = fmod(dropYs[i], 7.99999999);
-            setDRainDrop(map, i, dropYs[i], tailLen, r, g, b);
+            setDRainDrop(i, dropYs[i], tailLen, r, g, b);
             usleep(200);
         }
     }
 
     for(int i = 0; i < 8; i++){
-        setDRainDrop(map, i, dropYs[i], tailLen, 0.0, 0.0, 0.0);
+        setDRainDrop(i, dropYs[i], tailLen, 0.0, 0.0, 0.0);
     }
 }
 
 
 typedef struct DigitalRainThreadData {
-    uint16_t *map;
     int      *stopSig;
     double r;
     double g;
     double b;
 } DigitalRainThreadData;
 
-void *digitalRainThread(void *_b){
+static void *digitalRainThread(void *_b){
     DigitalRainThreadData  *dRainData= _b;
 
-    uint16_t *map      = dRainData->map;
     int      *stopSig  = dRainData->stopSig;
     double   r         = dRainData->r;
     double   g         = dRainData->g;
     double   b         = dRainData->b;
 
     free(dRainData);
-    digitalRain(map, stopSig, r, g, b);
+    digitalRain(stopSig, r, g, b);
 
     return NULL;
 }
@@ -92,12 +90,11 @@ void stopDigitalRain(){
     }
 }
 
-int startDigitalRain(uint16_t *map, double r, double g, double b){
+int startDigitalRain(double r, double g, double b){
     stopDigitalRain();
     _stopSig = 0;
 
     DigitalRainThreadData *dRainData = malloc(sizeof(DigitalRainThreadData));
-    dRainData->map      = map;
     dRainData->stopSig  = &_stopSig;
     dRainData->r        = r;
     dRainData->g        = g;

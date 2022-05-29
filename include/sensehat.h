@@ -2,27 +2,28 @@
 #define SENSEHAT_H_
 
 #include <stdint.h>
-#include <string.h>
 
-#define LEDS 64
-#define FILESIZE (LEDS * sizeof(uint16_t))
+#define LED_MATRIX_NUM_LEDS 64
+#define LED_MATRIX_FILESIZE (LED_MATRIX_NUM_LEDS * sizeof(uint16_t))
 
-uint16_t *getLedArr();
+int init_sensehat_led_matrix();
 
-void unmapLedArr(uint16_t *Arr);
+void destroy_sensehat_led_matrix();
 
-#define setVal(ledArr, x, y, val) ledArr[8*y+x] = val;
+void led_matrix_set_val(int x, int y, uint16_t val);
 
-#define clear(Arr) memset(Arr, 0, FILESIZE);
+void led_matrix_clear();
 
-#define fill(Arr,value) for(int i=0; i<LEDS; i+=1){ Arr[i] = value; }
+void led_matrix_fill(uint16_t val);
 
 // 16 bit color conversions
-uint16_t rgbIntToHex(uint16_t r, uint16_t g, uint16_t b);
+uint16_t rgb_int_to_hex(uint16_t r, uint16_t g, uint16_t b);
 
-uint16_t rgbDoubleToHex(double r, double g, double b);
+uint16_t rgb_double_to_hex(double r, double g, double b);
 
-void blitpixel(uint16_t *map, double x, double y, double r, double g, double b);
+void blit_pixel(double x, double y, double r, double g, double b);
+
+void blit_colored_line(int startX, int startY, int endX, int endY, double r, double g, double b);
 
 #endif
 

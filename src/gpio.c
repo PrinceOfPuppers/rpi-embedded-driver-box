@@ -13,7 +13,7 @@
 #define MAX_PIN_STR_SIZE 12
 static char pin_num_buff[MAX_PIN_STR_SIZE];
 
-int _export_pin(int export_fd, int pin_num_len, char *direction, int direction_len){
+static int _export_pin(int export_fd, int pin_num_len, char *direction, int direction_len){
     int fd;
 
     char *gpio_direction_str = malloc((strlen(GPIO_DIRECTION_FMT) - 2 + pin_num_len + 1) * sizeof(char));

@@ -24,7 +24,7 @@ static pthread_mutex_t in_buff_lock;
 static double joystick_x_cali;
 static double joystick_y_cali;
 
-int _get_raw(){
+static int _get_raw(){
     pthread_mutex_lock(&out_buff_lock);
     out_buff[0] = 0x00;
     if(!write_i2c(nunchuk_file_i2c, out_buff, 1)){
@@ -88,7 +88,7 @@ int init_nunchuk(){
 
 static pthread_t polling_tId;
 
-void *polling_thread(void *_){
+static void *polling_thread(void *_){
     while(polling){
         _get_raw();
         usleep(NUNCHUK_POLLING_TIME_MICROSECONDS);
@@ -132,7 +132,7 @@ void destroy_nunchuk(){
 
 #define nunchuk_clamp(val) max( min(val, 1L), -1L)
 
-void read_data(Nunchuk_Data *n){
+static void read_data(Nunchuk_Data *n){
     pthread_mutex_lock(&in_buff_lock);
     n->joystick_x = nunchuk_clamp( ((double)in_buff[0] - joystick_x_cali)/96L );
     n->joystick_y = nunchuk_clamp( ((double)in_buff[1] - joystick_y_cali)/96L );

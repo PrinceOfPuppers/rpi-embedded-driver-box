@@ -2,7 +2,7 @@
 
 #include <signal.h>
 
-void sigint_handler(){
+static void sigint_handler(){
     sigint_triggered = 1;
 }
 

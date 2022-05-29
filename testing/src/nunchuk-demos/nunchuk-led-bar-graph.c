@@ -14,7 +14,7 @@
 #include "led-bar-graph.h"
 
 
-int nunchuk_led_bar_graph(int *stop_sig){
+static int nunchuk_led_bar_graph(int *stop_sig){
     int err = 0;
     Nunchuk_Data n;
 
@@ -52,7 +52,7 @@ static pthread_t tId;
 static int _stop_sig;
 static int inited;
 
-void *nunchuk_led_bar_graph_thread(void *_){
+static void *nunchuk_led_bar_graph_thread(void *_){
     nunchuk_led_bar_graph(&_stop_sig);
     return NULL;
 }
