@@ -8,13 +8,9 @@
 #include "sigint-handler.h"
 #include "gpio.h"
 
-#define GPIO_PIN_1 "14"
-#define GPIO_PIN_2 "15"
-
-
 int two_led_flash(int *stop_sig){
-    int fd1 = export_pin(GPIO_PIN_1, "out");
-    int fd2 = export_pin(GPIO_PIN_2, "out");
+    int fd1 = export_pin(LED_FLASH_GPIO_PIN_1, "out");
+    int fd2 = export_pin(LED_FLASH_GPIO_PIN_2, "out");
     if (fd1 < 0 || fd2 < 0){return 1;}
 
     while(!sigint_triggered && !*stop_sig) {
@@ -43,7 +39,7 @@ int two_led_flash(int *stop_sig){
         return 1;
     }
 
-    if(!unexport_pin("14", fd1) || !unexport_pin("15", fd2)){return 1;}
+    if(!unexport_pin(LED_FLASH_GPIO_PIN_1, fd1) || !unexport_pin(LED_FLASH_GPIO_PIN_2, fd2)){return 1;}
     return 0;
 }
 

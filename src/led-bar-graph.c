@@ -7,7 +7,6 @@
 #include "gpio.h"
 
 int fds[LED_BAR_GRAPH_GPIO_NUM];
-char pin_num_buff[10];
 int initted = 0;
 
 int led_bar_graph_init(){
@@ -15,20 +14,8 @@ int led_bar_graph_init(){
         led_bar_graph_destroy();
     }
 
-    for(int i = 0; i < LED_BAR_GRAPH_GPIO_NUM; i++){
-        fds[i] = -1;
-    }
-
-    int pin_num;
-
-    for(int i = 0; i < LED_BAR_GRAPH_GPIO_NUM; i++){
-        pin_num = i + LED_BAR_GRAPH_GPIO_START;
-        sprintf(pin_num_buff ,"%i", pin_num);
-        fds[i] = export_pin(pin_num_buff, "out");
-        write(fds[i], "0", 1);
-        if(fds[i]<0){
-            return 0;
-        }
+    if (!export_pins(LED_BAR_GRAPH_GPIO_START, LED_BAR_GRAPH_GPIO_NUM, fds, "out")){
+        return 0;
     }
 
     initted = 1;
@@ -37,16 +24,14 @@ int led_bar_graph_init(){
 
 void led_bar_graph_destroy(){
     // no need to check initted
-    int pin_num;
     for(int i = 0; i < LED_BAR_GRAPH_GPIO_NUM; i++){
         if(fds[i] < 0){
             continue;
         }
-        pin_num = i + LED_BAR_GRAPH_GPIO_START;
         write(fds[i], "0", 1);
-        sprintf(pin_num_buff ,"%i", pin_num);
-        unexport_pin(pin_num_buff, fds[i]);
     }
+
+    unexport_pins(LED_BAR_GRAPH_GPIO_START, LED_BAR_GRAPH_GPIO_NUM, fds);
 
     initted = 0;
 }

@@ -209,12 +209,12 @@ void sensehat_cli(char *buffer, size_t *buffSize){
                 break;
             }
 
-            case 1894:{ //rmrain
+            case 3104:{ //rmrain
                 stopDigitalRain();
                 break;
             }
 
-            case 1867:{ //rmball
+            case 3055:{ //rmball
                 if(!popBall(&balls)){
                     printf("No Ball to Remove\n");
                     break;
@@ -223,7 +223,6 @@ void sensehat_cli(char *buffer, size_t *buffSize){
                 break;
 
             }
-
 
             case 672:{ //fix
                 fixed = 1;
