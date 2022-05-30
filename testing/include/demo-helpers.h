@@ -4,6 +4,11 @@ int randInt(int min, int max);
 
 double randDouble(double min, double max);
 
+void port_right_convert(double x, double y, double *nx, double *ny);
+void port_left_convert(double x, double y, double *nx, double *ny);
+void port_up_convert(double x, double y, double *nx, double *ny);
+void port_down_convert(double x, double y, double *nx, double *ny);
+
 #define mathMod(a, b)        \
 ({                           \
     __typeof__ (a) _a = (a); \

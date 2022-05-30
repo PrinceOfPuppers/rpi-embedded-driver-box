@@ -248,25 +248,20 @@ void sensehat_cli(char *buffer, size_t *buffSize){
                 };
                 char direction = arg1[0];
 
-                if(direction == 'r'){     printf("Ports Right ->\n");}
-                else if(direction == 'l'){printf("<- Ports Left\n");}
-                else if(direction == 'u'){printf("Ports Up ^\n");}
-                else if(direction == 'd'){printf("Ports Down v\n");}
+                switch(direction){
+                    case 'r': printf("Ports Right ->\n"); break;
+                    case 'l': printf("<- Ports Left\n"); break;
+                    case 'u': printf("Ports Up ^\n"); break;
+                    case 'd': printf("Ports Down v\n"); break;
+                }
 
                 for(int x = 0; x < 8; x++){
                     for(int y = 0; y < 8; y++){
-                        if(direction == 'r'){
-                            printf("(%i,%i) ", y, x);
-                        }
-                        if(direction == 'l'){
-                            printf("(%i,%i) ", mathMod(7-y,8), mathMod(7-x,8));
-                        }
-
-                        if(direction == 'u'){
-                            printf("(%i,%i) ", mathMod(7-x,8), y);
-                        }
-                        if(direction == 'd'){
-                            printf("(%i,%i) ", x, mathMod(7-y,8));
+                        switch(direction){
+                            case 'r': printf("(%i,%i) ", y, x); break;
+                            case 'l': printf("(%i,%i) ", mathMod(7-y,8), mathMod(7-x,8)); break;
+                            case 'u': printf("(%i,%i) ", mathMod(7-x,8), y); break;
+                            case 'd': printf("(%i,%i) ", x, mathMod(7-y,8)); break;
                         }
                     }
                     printf("\n\n");

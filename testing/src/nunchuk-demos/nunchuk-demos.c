@@ -3,7 +3,8 @@
 #include <stdio.h>
 
 #include "nunchuk-demos/nunchuk-led-bar-graph.h"
-#include "nunchuk-demos/nunchuk-sensehat.h"
+#include "nunchuk-demos/nunchuk-joystick-sensehat.h"
+#include "nunchuk-demos/nunchuk-acc-sensehat.h"
 #include "nunchuk.h"
 #include "demo-helpers.h"
 #include "sigint-handler.h"
@@ -19,6 +20,8 @@ void nunchuk_cli(char *buffer, size_t *buffSize){
 
     char *cursor    ;
     char *cursorNext;
+
+    char *arg1;
 
     while(!sigint_triggered){
         printf("\nNunchuk Demos (type help for options):\n");
@@ -42,13 +45,35 @@ void nunchuk_cli(char *buffer, size_t *buffSize){
                 break;
             }
 
-            case 3276:{ // matrix
-                start_nunchuk_sensehat();
+            case 3166:{ // joyhat
+                if(!getNARgs(&cursor, &cursorNext, 1, &arg1)){
+                    printf("1 Arg is required for which direction the ports of the pi are facing, one of (u, d, l, r)\n");
+                    continue;
+                };
+                char direction = arg1[0];
+
+                start_nunchuk_joystick_sensehat(direction);
                 break;
             }
 
-            case 6615:{ // rmmatrix
-                stop_nunchuk_sensehat();
+            case 6429:{ // rmjoyhat
+                stop_nunchuk_acc_sensehat();
+                break;
+            }
+
+            case 3067:{ // acchat
+                if(!getNARgs(&cursor, &cursorNext, 1, &arg1)){
+                    printf("1 Arg is required for which direction the ports of the pi are facing, one of (u, d, l, r)\n");
+                    continue;
+                };
+                char direction = arg1[0];
+
+                start_nunchuk_acc_sensehat(direction);
+                break;
+            }
+
+            case 6188:{ // rmacchat
+                stop_nunchuk_acc_sensehat();
                 break;
             }
 
@@ -91,6 +116,6 @@ void nunchuk_cli(char *buffer, size_t *buffSize){
     
     nunchuk_cli_clean_up:
     stop_nunchuk_led_bar_graph();
-    stop_nunchuk_sensehat();
+    stop_nunchuk_joystick_sensehat();
     destroy_nunchuk();
 }

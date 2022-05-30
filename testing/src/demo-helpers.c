@@ -15,6 +15,30 @@ double randDouble(double min, double max){
 }
 
 
+static double dmod(double x, double y) {
+    return x - (int)(x/y) * y;
+}
+
+void port_right_convert(double x, double y, double *nx, double *ny){
+    *nx = x;
+    *ny = dmod(7.0-y, 8.0);
+}
+
+void port_left_convert(double x, double y, double *nx, double *ny){
+    *nx = dmod(7.0-x, 8.0);
+    *ny = y;
+}
+
+void port_up_convert(double x, double y, double *nx, double *ny){
+    *nx = y;
+    *ny = x;
+}
+
+void port_down_convert(double x, double y, double *nx, double *ny){
+    *nx = dmod(7.0-y, 8.0);
+    *ny = dmod(7.0-x, 8.0);
+}
+
 
 int primes[11] = {1,2,3,5,7,11,13,17,19,23,29};
 
