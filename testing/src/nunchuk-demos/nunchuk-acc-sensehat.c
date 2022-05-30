@@ -21,9 +21,6 @@
 
 
 static int nunchuk_acc_sensehat(int *stop_sig, char direction){
-    if(!init_sensehat_led_matrix()){
-        return 0;
-    }
     Nunchuk_Data n;
     
     double x = ((double)LED_MATRIX_WIDTH - 1)/ 2;
@@ -82,8 +79,6 @@ static int nunchuk_acc_sensehat(int *stop_sig, char direction){
     }
     coordinate_converter(x, y, &_x, &_y);
     blit_pixel(_x, _y, 0.0, 0.0, 0.0);
-
-    destroy_sensehat_led_matrix();
     return 0;
 }
 

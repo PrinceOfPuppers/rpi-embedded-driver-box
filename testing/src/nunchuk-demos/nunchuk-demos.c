@@ -5,6 +5,7 @@
 #include "nunchuk-demos/nunchuk-led-bar-graph.h"
 #include "nunchuk-demos/nunchuk-joystick-sensehat.h"
 #include "nunchuk-demos/nunchuk-acc-sensehat.h"
+#include "sensehat.h"
 #include "nunchuk.h"
 #include "demo-helpers.h"
 #include "sigint-handler.h"
@@ -15,6 +16,9 @@ void nunchuk_cli(char *buffer, size_t *buffSize){
         printf("error getting nunchuk\n");
         return;
     };
+    if(!init_sensehat_led_matrix()){
+        return;
+    }
 
     start_nunchuk_polling();
 
@@ -32,7 +36,6 @@ void nunchuk_cli(char *buffer, size_t *buffSize){
         cursorNext = buffer;
 
         argGenerator(&cursor,&cursorNext);
-        printf("%s: %i\n", cursor, smallHash(cursor));
         switch(smallHash(cursor)){
 
             case 634:{ // bar
@@ -57,7 +60,7 @@ void nunchuk_cli(char *buffer, size_t *buffSize){
             }
 
             case 6429:{ // rmjoyhat
-                stop_nunchuk_acc_sensehat();
+                stop_nunchuk_joystick_sensehat();
                 break;
             }
 
@@ -121,5 +124,7 @@ void nunchuk_cli(char *buffer, size_t *buffSize){
     nunchuk_cli_clean_up:
     stop_nunchuk_led_bar_graph();
     stop_nunchuk_joystick_sensehat();
+    stop_nunchuk_acc_sensehat();
+    destroy_sensehat_led_matrix();
     destroy_nunchuk();
 }
