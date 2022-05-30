@@ -26,8 +26,8 @@ static int nunchuk_acc_sensehat(int *stop_sig, char direction){
     }
     Nunchuk_Data n;
     
-    double x = 0.0;
-    double y = 0.0;
+    double x = ((double)LED_MATRIX_WIDTH - 1)/ 2;
+    double y = ((double)LED_MATRIX_WIDTH - 1)/ 2;
 
     double vx = 0.0;
     double vy = 0.0;

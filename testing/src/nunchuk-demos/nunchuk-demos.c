@@ -96,11 +96,15 @@ void nunchuk_cli(char *buffer, size_t *buffSize){
 
             case 1190:{ // help
                 printf( "Commands:\n"
-                        "   bar       using the nunchuk, control an led bar graph on gpio pins specified in led-bar-graph.h\n"
-                        "   rmbar     stops bar\n"
-                        "   data      get a snapshot of the nunchuks state\n" 
-                        "   rawdata   get a snapshot of the raw data being sent by the nunchuk\n" 
-                        "   q         quits to previous menu\n");
+                        "   bar          using the nunchuk's joystick, control an led bar graph on gpio pins specified in led-bar-graph.h\n"
+                        "   rmbar        stops bar\n"
+                        "   joyhat dir   use the joystick to move a ball on the sensehat's led matrix, dir is where the pi's ports are facing (u, d, l r)\n"
+                        "   rmjoyhat     stops joyhat\n"
+                        "   acchat dir   use tilt controls to move a ball on the sensehat's led matrix, dir is where pi's ports are facing (u, d, l r)\n"
+                        "   rmacchat     stops acchat\n"
+                        "   data         get a snapshot of the nunchuks state\n"
+                        "   rawdata      get a snapshot of the raw data being sent by the nunchuk\n"
+                        "   q            quits to previous menu\n");
                 break;
             }
 
