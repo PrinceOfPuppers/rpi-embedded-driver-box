@@ -16,9 +16,6 @@ void nunchuk_cli(char *buffer, size_t *buffSize){
         printf("error getting nunchuk\n");
         return;
     };
-    if(!init_sensehat_led_matrix()){
-        return;
-    }
 
     start_nunchuk_polling();
 
@@ -49,6 +46,9 @@ void nunchuk_cli(char *buffer, size_t *buffSize){
             }
 
             case 3166:{ // joyhat
+                if(!init_sensehat_led_matrix()){
+                    continue;
+                }
                 if(!getNARgs(&cursor, &cursorNext, 1, &arg1)){
                     printf("1 Arg is required for which direction the ports of the pi are facing, one of (u, d, l, r)\n");
                     continue;
@@ -65,6 +65,9 @@ void nunchuk_cli(char *buffer, size_t *buffSize){
             }
 
             case 3067:{ // acchat
+                if(!init_sensehat_led_matrix()){
+                    continue;
+                }
                 if(!getNARgs(&cursor, &cursorNext, 1, &arg1)){
                     printf("1 Arg is required for which direction the ports of the pi are facing, one of (u, d, l, r)\n");
                     continue;
