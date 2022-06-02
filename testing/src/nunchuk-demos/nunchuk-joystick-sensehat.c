@@ -69,6 +69,7 @@ static void *nunchuk_joystick_sensehat_thread(void *_d){
     int *stop_sig  = d->stop_sig;
     char direction = d->direction;
     nunchuk_joystick_sensehat(stop_sig, direction);
+    free(d);
     return NULL;
 }
 

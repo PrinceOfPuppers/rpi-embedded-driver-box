@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 
+#include "nunchuk-demos/nunchuk-joystick-mouse.h"
 #include "nunchuk-demos/nunchuk-led-bar-graph.h"
 #include "nunchuk-demos/nunchuk-joystick-sensehat.h"
 #include "nunchuk-demos/nunchuk-acc-sensehat.h"
@@ -33,6 +34,7 @@ void nunchuk_cli(char *buffer, size_t *buffSize){
         cursorNext = buffer;
 
         argGenerator(&cursor,&cursorNext);
+        printf("%s: %i\n",cursor, smallHash(cursor));
         switch(smallHash(cursor)){
 
             case 634:{ // bar
@@ -83,6 +85,16 @@ void nunchuk_cli(char *buffer, size_t *buffSize){
                 break;
             }
 
+            case 6512:{ // joymouse
+                start_nunchuk_joystick_mouse("/dev/hidg0");
+                break;
+            }
+
+            case 11191:{ // rmjoymouse
+                stop_nunchuk_joystick_mouse();
+                break;
+            }
+
             case 1127:{ // data
                 print_nunchuk();
                 break;
@@ -108,6 +120,8 @@ void nunchuk_cli(char *buffer, size_t *buffSize){
                         "   rmjoyhat     stops joyhat\n"
                         "   acchat dir   use tilt controls to move a ball on the sensehat's led matrix, dir is where pi's ports are facing (u, d, l r)\n"
                         "   rmacchat     stops acchat\n"
+                        "   joymouse     use nunchuk/rpi as a mouse! (run ./configure-rpi-hid and reboot, for rpi4 plug usb-c port into host computer)\n"
+                        "   rmjoymouse   stops joymouse\n"
                         "   data         get a snapshot of the nunchuks state\n"
                         "   rawdata      get a snapshot of the raw data being sent by the nunchuk\n"
                         "   q            quits to previous menu\n");

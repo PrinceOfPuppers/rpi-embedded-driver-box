@@ -98,6 +98,7 @@ static void *nunchuk_acc_sensehat_thread(void *_d){
     char direction = d->direction;
 
     nunchuk_acc_sensehat(stop_sig, direction);
+    free(d);
     return NULL;
 }
 
