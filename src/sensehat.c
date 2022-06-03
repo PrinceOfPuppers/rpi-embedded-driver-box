@@ -18,7 +18,7 @@
 
 static int led_matrix_fd;
 
-static int led_matrix_inited;
+static int led_matrix_inited = 0;
 static uint16_t *led_matrix;
 
 int init_sensehat_led_matrix(){
@@ -68,6 +68,9 @@ int init_sensehat_led_matrix(){
 }
 
 void destroy_sensehat_led_matrix(){
+    if (!led_matrix_inited){
+        return;
+    }
     // unmap virtual memory corrisponding to frame buffer
     if (munmap(led_matrix, LED_MATRIX_FILESIZE ) == -1) {
 	    perror("error un-mmapping sensehat led matrix");
