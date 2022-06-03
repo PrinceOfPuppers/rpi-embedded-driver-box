@@ -34,7 +34,7 @@ void nunchuk_cli(char *buffer, size_t *buffSize){
         cursorNext = buffer;
 
         argGenerator(&cursor,&cursorNext);
-        printf("%s: %i\n",cursor, smallHash(cursor));
+        //printf("%s: %i\n",cursor, smallHash(cursor));
         switch(smallHash(cursor)){
 
             case 634:{ // bar
