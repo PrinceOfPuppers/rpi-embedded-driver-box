@@ -3,8 +3,8 @@
 
 
 // absolute distance from zero which is considered no movement (nunchuk joystick range is -1 to 1)
-#define MOUSE_JOYSTICK_DEADZONE_X 0.06
-#define MOUSE_JOYSTICK_DEADZONE_Y 0.03
+#define MOUSE_JOYSTICK_DEADZONE_X 0.01
+#define MOUSE_JOYSTICK_DEADZONE_Y 0.01
 
 
 // 0 to 1, higher is more sensitive (its a multiplier)
