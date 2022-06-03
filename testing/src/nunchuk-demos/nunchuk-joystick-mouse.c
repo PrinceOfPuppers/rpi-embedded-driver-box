@@ -19,6 +19,55 @@
 #define MOUSE_REPORT_SIZE 3
 
 
+
+static int _shake_end_countdown = 0;
+static int _shake_start_countdown = SHAKE_STARTUP_TIMER;
+static int _shaking = 0;
+
+// off: -1, lmb: 0, rmb: 1, mmb: 2
+static int _shake_click = 1;
+static int _clicks[] = {LMB_VAL, RMB_VAL, MMB_VAL};
+
+int is_shaking(Nunchuk_Data *n){
+    double g_force = sqrt(n->acc_x_g*n->acc_x_g + n->acc_y_g*n->acc_y_g + n->acc_z_g*n->acc_z_g);
+    int shake = g_force > MAX_NOSHAKE_RANGE || g_force < MIN_NOSHAKE_RANGE ? 1 : 0; 
+
+    if(shake){
+
+        // shake startup 
+        if(!_shaking){
+            printf("shake startup\n");
+            if(_shake_start_countdown < 1){
+                _shake_start_countdown = SHAKE_STARTUP_TIMER;
+                _shaking = 1;
+            }
+            else{
+                _shake_start_countdown--;
+                return 0;
+            }
+        }
+
+        
+        _shake_end_countdown = SHAKE_PERSIST_TIMER;
+        printf("g_force: %f\n", g_force);
+        return 1;
+    }
+
+    if(_shake_end_countdown == 1){
+        printf("shake over\n");
+    }
+    _shake_end_countdown--;
+    if(_shake_end_countdown < 1){
+        _shake_end_countdown = 0;
+
+        _shaking = 0;
+        return 0;
+    }
+    printf("shake ending\n");
+    printf("g_force: %f\n", g_force);
+    return 1;
+}
+
 void nunchuk_fill_mouse_report(char report[MOUSE_REPORT_SIZE], Nunchuk_Data *n){
     double mouse_x = fabs(n->joystick_x) < MOUSE_JOYSTICK_DEADZONE_X ? 0.0 : n->joystick_x*MAX_MOUSE_MOVE_DOUBLE;
     double mouse_y = fabs(n->joystick_y) < MOUSE_JOYSTICK_DEADZONE_Y ? 0.0 : -n->joystick_y*MAX_MOUSE_MOVE_DOUBLE;
@@ -26,6 +75,14 @@ void nunchuk_fill_mouse_report(char report[MOUSE_REPORT_SIZE], Nunchuk_Data *n){
     report[0] = (n->c)*LMB_VAL | (n->z)*RMB_VAL;
     report[1] = (int)(MOUSE_JOYSTICK_SENSITIVITY_X*mouse_x);
     report[2] = (int)(MOUSE_JOYSTICK_SENSITIVITY_Y*mouse_y);
+
+    if(_shake_click > -1){
+        if(is_shaking(n)){
+            report[0] |= _clicks[_shake_click];
+            printf("Shake !!\n");
+        }
+
+    }
 }
 
 #define MOUSE_RECONNECT_INTERVAL_MICROSECONDS 5000000
@@ -107,4 +164,33 @@ int start_nunchuk_joystick_mouse(char *device_file){
     inited = 1;
 
     return 1;
+}
+int nunchuk_joystick_mouse_started(){
+    return inited;
+}
+
+void start_nunchuk_shake_click(char button){
+    switch(button){
+        case 'l':{
+            _shake_click = 0;
+            break;
+        }
+        case 'r':{
+            _shake_click = 1;
+            break;
+        }
+        case 'm':{
+            _shake_click = 2;
+            break;
+        }
+        default:{
+            _shake_click = -1;
+            break;
+
+        }
+    }
+}
+
+void stop_nunchuk_shake_click(){
+    _shake_click = -1;
 }

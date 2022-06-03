@@ -95,6 +95,25 @@ void nunchuk_cli(char *buffer, size_t *buffSize){
                 break;
             }
 
+            case 10476:{ // shakeclick
+                if(!getNARgs(&cursor, &cursorNext, 1, &arg1)){
+                    printf("1 Arg is required for which mouse button shaking the nunchuk is mapped to (l, r, m)\n");
+                    continue;
+                };
+                char button = arg1[0];
+
+                start_nunchuk_shake_click(button);
+                if(!nunchuk_joystick_mouse_started()){
+                    printf("shakeclick started, however joymouse must also be started for this to have an effect\n");
+                }
+                break;
+            }
+
+            case 16704:{ // rmshakeclick
+                stop_nunchuk_shake_click();
+                break;
+            }
+
             case 1127:{ // data
                 print_nunchuk();
                 break;
@@ -114,17 +133,19 @@ void nunchuk_cli(char *buffer, size_t *buffSize){
 
             case 1190:{ // help
                 printf( "Commands:\n"
-                        "   bar          using the nunchuk's joystick, control an led bar graph on gpio pins specified in led-bar-graph.h\n"
-                        "   rmbar        stops bar\n"
-                        "   joyhat dir   use the joystick to move a ball on the sensehat's led matrix, dir is where the pi's ports are facing (u, d, l r)\n"
-                        "   rmjoyhat     stops joyhat\n"
-                        "   acchat dir   use tilt controls to move a ball on the sensehat's led matrix, dir is where pi's ports are facing (u, d, l r)\n"
-                        "   rmacchat     stops acchat\n"
-                        "   joymouse     use nunchuk/rpi as a mouse! (run ./configure-rpi-hid and reboot, for rpi4 plug usb-c port into host computer)\n"
-                        "   rmjoymouse   stops joymouse\n"
-                        "   data         get a snapshot of the nunchuks state\n"
-                        "   rawdata      get a snapshot of the raw data being sent by the nunchuk\n"
-                        "   q            quits to previous menu\n");
+                        "   bar                using the nunchuk's joystick, control an led bar graph on gpio pins specified in led-bar-graph.h\n"
+                        "   rmbar              stops bar\n"
+                        "   joyhat dir         use the joystick to move a ball on the sensehat's led matrix, dir is where the pi's ports are facing (u, d, l r)\n"
+                        "   rmjoyhat           stops joyhat\n"
+                        "   acchat dir         use tilt controls to move a ball on the sensehat's led matrix, dir is where pi's ports are facing (u, d, l r)\n"
+                        "   rmacchat           stops acchat\n"
+                        "   joymouse           use nunchuk/rpi as a mouse! (run ./configure-rpi-hid and reboot, for rpi4 plug usb-c port into host computer)\n"
+                        "   rmjoymouse         stops joymouse\n"
+                        "   shakeclick button  when joymouse is enabled, maps shaking the nunchuk onto mouse button click (l, r, m)\n"
+                        "   rmshakeclick       disables shakeclick\n"
+                        "   data               get a snapshot of the nunchuks state\n"
+                        "   rawdata            get a snapshot of the raw data being sent by the nunchuk\n"
+                        "   q                  quits to previous menu\n");
                 break;
             }
 

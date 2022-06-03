@@ -1,5 +1,6 @@
 #include "nunchuk.h"
 
+#include <math.h>
 #include <stdint.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -23,6 +24,13 @@ static pthread_mutex_t in_buff_lock;
 
 static double joystick_x_cali;
 static double joystick_y_cali;
+
+// acceleration due to gravity as measured by accelerometers
+static double grav_mag_cali;
+
+
+#define nunchuk_clamp(val) max( min(val, 1L), -1L)
+
 
 static int _get_raw(){
     pthread_mutex_lock(&out_buff_lock);
@@ -80,11 +88,23 @@ int init_nunchuk(){
     pthread_mutex_lock(&in_buff_lock);
     joystick_x_cali = (double)in_buff[0];
     joystick_y_cali = (double)in_buff[1];
+
+    double acc_x = nunchuk_clamp(( (double)(( in_buff[2] << 2 ) | ((in_buff[5] >> 2) & 0x03)) - 512L ) / 512L);
+    double acc_y = nunchuk_clamp(( (double)(( in_buff[3] << 2 ) | ((in_buff[5] >> 4) & 0x03)) - 512L ) / 512L);
+    double acc_z = nunchuk_clamp(( (double)(( in_buff[4] << 2 ) | ((in_buff[5] >> 6) & 0x03)) - 512L ) / 512L);
     pthread_mutex_unlock(&in_buff_lock);
+
+    grav_mag_cali = sqrt(acc_x*acc_x + acc_y*acc_y + acc_z*acc_z);
+    if(grav_mag_cali < 0.1){
+        printf("nunchuk accelerometer issue, gravitational acceleration is too small\n");
+        grav_mag_cali = 0.45; // rough fallback from testing
+    }
+
     calibrated = 1;
 
     return 1;
 }
+
 
 static pthread_t polling_tId;
 
@@ -130,7 +150,6 @@ void destroy_nunchuk(){
     calibrated = 0;
 }
 
-#define nunchuk_clamp(val) max( min(val, 1L), -1L)
 
 static void read_data(Nunchuk_Data *n){
     pthread_mutex_lock(&in_buff_lock);
@@ -144,6 +163,10 @@ static void read_data(Nunchuk_Data *n){
     n->acc_y = nunchuk_clamp(( (double)(( in_buff[3] << 2 ) | ((in_buff[5] >> 4) & 0x03)) - 512L ) / 512L);
     n->acc_z = nunchuk_clamp(( (double)(( in_buff[4] << 2 ) | ((in_buff[5] >> 6) & 0x03)) - 512L ) / 512L);
     pthread_mutex_unlock(&in_buff_lock);
+
+    n->acc_x_g = n->acc_x / grav_mag_cali;
+    n->acc_y_g = n->acc_y / grav_mag_cali;
+    n->acc_z_g = n->acc_z / grav_mag_cali;
 }
 
 int get_nunchuk( Nunchuk_Data *n ){

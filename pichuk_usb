@@ -9,7 +9,6 @@ echo 0xc332 > idProduct # G502 Proteus Spectrum Optical Mouse
 echo 0x0100 > bcdDevice # v1.0.0
 echo 0x0200 > bcdUSB    # USB2
 
-
 mkdir -p strings/0x409
 echo "fedcba9876543210" > strings/0x409/serialnumber
 echo "Joshua McPherson" > strings/0x409/manufacturer

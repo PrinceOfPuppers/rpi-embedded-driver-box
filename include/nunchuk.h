@@ -23,6 +23,11 @@ struct Nunchuk_Data{
     double acc_y;
     double acc_z;
 
+    // acc but in units of g
+    double acc_x_g;
+    double acc_y_g;
+    double acc_z_g;
+
     int c; // pressed == true
     int z; // pressed == true
 };

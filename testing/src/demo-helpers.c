@@ -40,7 +40,7 @@ void port_down_convert(double x, double y, double *nx, double *ny){
 }
 
 
-int primes[11] = {1,2,3,5,7,11,13,17,19,23,29};
+static int primes[] = {1, 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41};
 
 int smallHash(char * str){
     int sum = 0;
