@@ -40,7 +40,7 @@ static int nunchuk_joystick_sensehat(int *stop_sig, char direction){
     coordinate_converter(x, y, &_x, &_y);
 
     while(!sigint_triggered && !*stop_sig){
-        usleep(5000);
+        usleep(10000);
         if(!get_nunchuk(&n)){continue;};
 
         blit_pixel(_x, _y, 0.0, 0.0, 0.0);

@@ -1,6 +1,7 @@
 #include "nunchuk.h"
 
 #include <math.h>
+#include <string.h>
 #include <stdint.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -152,17 +153,22 @@ void destroy_nunchuk(){
 
 
 static void read_data(Nunchuk_Data *n){
+
+    // copy buffer to not block other threads during read
+    uint8_t _tmp_buff[NUNCHUK_PACKET_SIZE];
     pthread_mutex_lock(&in_buff_lock);
-    n->joystick_x = nunchuk_clamp( ((double)in_buff[0] - joystick_x_cali)/96L );
-    n->joystick_y = nunchuk_clamp( ((double)in_buff[1] - joystick_y_cali)/96L );
-
-    n->c = (in_buff[5] & 0x02) == 0x00;
-    n->z = (in_buff[5] & 0x01) == 0x00;
-
-    n->acc_x = nunchuk_clamp(( (double)(( in_buff[2] << 2 ) | ((in_buff[5] >> 2) & 0x03)) - 512L ) / 512L);
-    n->acc_y = nunchuk_clamp(( (double)(( in_buff[3] << 2 ) | ((in_buff[5] >> 4) & 0x03)) - 512L ) / 512L);
-    n->acc_z = nunchuk_clamp(( (double)(( in_buff[4] << 2 ) | ((in_buff[5] >> 6) & 0x03)) - 512L ) / 512L);
+    memcpy(_tmp_buff, in_buff, NUNCHUK_PACKET_SIZE);
     pthread_mutex_unlock(&in_buff_lock);
+
+    n->joystick_x = nunchuk_clamp( ((double)_tmp_buff[0] - joystick_x_cali)/96L );
+    n->joystick_y = nunchuk_clamp( ((double)_tmp_buff[1] - joystick_y_cali)/96L );
+
+    n->c = (_tmp_buff[5] & 0x02) == 0x00;
+    n->z = (_tmp_buff[5] & 0x01) == 0x00;
+
+    n->acc_x = nunchuk_clamp(( (double)(( _tmp_buff[2] << 2 ) | ((_tmp_buff[5] >> 2) & 0x03)) - 512L ) / 512L);
+    n->acc_y = nunchuk_clamp(( (double)(( _tmp_buff[3] << 2 ) | ((_tmp_buff[5] >> 4) & 0x03)) - 512L ) / 512L);
+    n->acc_z = nunchuk_clamp(( (double)(( _tmp_buff[4] << 2 ) | ((_tmp_buff[5] >> 6) & 0x03)) - 512L ) / 512L);
 
     n->acc_x_g = n->acc_x / grav_mag_cali;
     n->acc_y_g = n->acc_y / grav_mag_cali;
