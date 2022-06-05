@@ -117,6 +117,7 @@ int start_nunchuk_acc_sensehat(char direction){
     d->direction = direction;
     int error = pthread_create(&tId, NULL, nunchuk_acc_sensehat_thread, (void*)d);
     if (error) {
+        printf("error creating thread\n");
         free(d);
         return 0;
     }

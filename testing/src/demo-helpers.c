@@ -1,6 +1,7 @@
 #include "demo-helpers.h"
 
 #include <stdlib.h>
+#include <string.h>
 #include <stdarg.h>
 #include <stdint.h>
 #include <math.h>
@@ -40,9 +41,14 @@ void port_down_convert(double x, double y, double *nx, double *ny){
 }
 
 
-static int primes[] = {1, 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41};
+#define NUM_PRIMES 14
+static int primes[NUM_PRIMES] = {1, 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41};
 
 int smallHash(char * str){
+    if(strlen(str) > NUM_PRIMES){
+        return -1;
+    }
+
     int sum = 0;
     int i=0;
     while(str[i] != '\0'){
