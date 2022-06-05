@@ -18,7 +18,7 @@
 #define MAX_MOUSE_MOVE_DOUBLE 127.0
 #define MOUSE_REPORT_SIZE 3
 
-
+#define fsign(x) (signbit(x) ?  -1 : 1)
 
 static int _shake_end_countdown = 0;
 static int _shake_start_countdown = SHAKE_STARTUP_TIMER;
@@ -69,8 +69,8 @@ int is_shaking(Nunchuk_Data *n){
 }
 
 void nunchuk_fill_mouse_report(char report[MOUSE_REPORT_SIZE], Nunchuk_Data *n){
-    double mouse_x = fabs(n->joystick_x) < MOUSE_JOYSTICK_DEADZONE_X ? 0.0 :  ( n->joystick_x - MOUSE_JOYSTICK_DEADZONE_X )*MAX_MOUSE_MOVE_DOUBLE;
-    double mouse_y = fabs(n->joystick_y) < MOUSE_JOYSTICK_DEADZONE_Y ? 0.0 : -( n->joystick_y - MOUSE_JOYSTICK_DEADZONE_Y )*MAX_MOUSE_MOVE_DOUBLE;
+    double mouse_x = fabs(n->joystick_x) < MOUSE_JOYSTICK_DEADZONE_X ? 0.0 :  ( n->joystick_x - fsign(n->joystick_x)*MOUSE_JOYSTICK_DEADZONE_X )*MAX_MOUSE_MOVE_DOUBLE;
+    double mouse_y = fabs(n->joystick_y) < MOUSE_JOYSTICK_DEADZONE_Y ? 0.0 : -( n->joystick_y - fsign(n->joystick_y)*MOUSE_JOYSTICK_DEADZONE_Y )*MAX_MOUSE_MOVE_DOUBLE;
 
     report[0] = (n->c)*LMB_VAL | (n->z)*RMB_VAL;
     report[1] = (int)(MOUSE_JOYSTICK_SENSITIVITY_X*mouse_x);
